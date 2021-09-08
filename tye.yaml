@@ -1,0 +1,49 @@
+name: inflow
+services:
+- name: API
+  project: src/APIGateway/Inflow.APIGateway/Inflow.APIGateway.csproj
+  bindings:
+  - port: 5000
+  env:
+    - name: ASPNETCORE_ENVIRONMENT
+      value: development
+
+- name: Customers
+  project: src/Customers/Inflow.Services.Customers.Api/Inflow.Services.Customers.Api.csproj
+  bindings:
+  - port: 5010
+  env:
+    - name: ASPNETCORE_ENVIRONMENT
+      value: development
+
+- name: Payments
+  project: src/Payments/Inflow.Services.Payments.Api/Inflow.Services.Payments.Api.csproj
+  bindings:
+  - port: 5020
+  env:
+    - name: ASPNETCORE_ENVIRONMENT
+      value: development
+
+- name: Users
+  project: src/Users/Inflow.Services.Users.Api/Inflow.Services.Users.Api.csproj
+  bindings:
+  - port: 5030
+  env:
+    - name: ASPNETCORE_ENVIRONMENT
+      value: development
+
+- name: Wallets
+  project: src/Wallets/Inflow.Services.Wallets.Api/Inflow.Services.Wallets.Api.csproj
+  bindings:
+  - port: 5050
+  env:
+    - name: ASPNETCORE_ENVIRONMENT
+      value: development
+
+- name: Saga
+  project: src/Saga/Inflow.Saga.Api/Inflow.Saga.Api.csproj
+  bindings:
+  - port: 5060
+  env:
+    - name: ASPNETCORE_ENVIRONMENT
+      value: development

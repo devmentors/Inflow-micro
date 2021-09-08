@@ -1,0 +1,62 @@
+@url = http://localhost:5050
+@transferId = 00000000-0000-0000-0000-000000000001
+@walletId = 00000000-0000-0000-0000-000000000001
+@receiverWalletId = 00000000-0000-0000-0000-000000000001
+@accessToken = secret
+
+###
+GET {{url}}/transfers
+Authorization: Bearer {{accessToken}}
+
+###
+GET {{url}}/transfers/{{walletId}}
+Authorization: Bearer {{accessToken}}
+
+###
+POST {{url}}/transfers/incoming
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "walletId": "{{walletId}}",
+  "currency": "PLN",
+  "amount": "1000",
+  "transferName": "test123",
+  "transferMetadata": "lorem ipsum metadata"
+}
+
+###
+POST {{url}}/transfers/outgoing
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "walletId": "{{walletId}}",
+  "currency": "PLN",
+  "amount": "500",
+  "transferName": "test123",
+  "transferMetadata": "lorem ipsum metadata"
+}
+
+
+###
+POST {{url}}/transfers/funds
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "ownerWalletId": "{{walletId}}",
+  "receiverWalletId": "{{receiverWalletId}}",
+  "currency": "PLN",
+  "amount": "200"
+}
+
+
+###
+GET {{url}}/wallets
+Authorization: Bearer {{accessToken}}
+
+###
+GET {{url}}/wallets/{{walletId}}
+Authorization: Bearer {{accessToken}}
+

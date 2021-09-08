@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+      <TargetFramework>net5.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Convey.Auth" Version="0.5.*" />
+      <PackageReference Include="Convey.HTTP" Version="0.5.*" />
+      <PackageReference Include="Convey.Logging" Version="0.5.*" />
+      <PackageReference Include="Convey.MessageBrokers.CQRS" Version="0.5.*" />
+      <PackageReference Include="Convey.MessageBrokers.RabbitMQ" Version="0.5.*" />
+      <PackageReference Include="Convey.Metrics.Prometheus" Version="0.5.*" />
+      <PackageReference Include="Convey.Secrets.Vault" Version="0.5.*" />
+      <PackageReference Include="Convey.Security" Version="0.5.*" />
+      <PackageReference Include="Convey.Tracing.Jaeger" Version="0.5.*" />
+      <PackageReference Include="Convey.Tracing.Jaeger.RabbitMQ" Version="0.5.*" />
+      <PackageReference Include="Yarp.ReverseProxy" Version="1.0.0-preview.12.21451.3" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="certs\**" CopyToPublishDirectory="Always" />
+    </ItemGroup>
+
+</Project>

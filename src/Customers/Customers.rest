@@ -1,0 +1,60 @@
+@url = http://localhost:5010
+@customerId = 00000000-0000-0000-0000-000000000001
+@accessToken = secret
+
+###
+GET {{url}}
+
+###
+GET {{url}}/customers
+Authorization: Bearer {{accessToken}}
+
+###
+GET {{url}}/customers/{{customerId}}
+Authorization: Bearer {{accessToken}}
+
+###
+POST {{url}}/customers
+Content-Type: application/json
+
+{
+  "email": "user1@inflow.io"
+}
+
+###
+PUT {{url}}/customers/complete
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "user1",
+  "fullName": "John Doe",
+  "address": "Test street 123",
+  "nationality": "PL",
+  "identityType": "id_card",
+  "identitySeries": "ABC1234567"
+}
+
+###
+PUT {{url}}/customers/{{customerId}}/verify
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+}
+
+###
+PUT {{url}}/customers/{{customerId}}/lock
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+}
+
+###
+PUT {{url}}/customers/{{customerId}}/unlock
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+}

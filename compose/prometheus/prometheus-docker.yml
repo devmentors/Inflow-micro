@@ -1,0 +1,36 @@
+global:
+  scrape_interval:     5s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  evaluation_interval: 5s # Evaluate rules every 15 seconds. The default is every 1 minute.
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['prometheus:9090']
+
+  - job_name: 'api-gateway'
+    static_configs:
+      - targets: ['api-gateway']
+
+  - job_name: 'customers-service'
+    static_configs:
+      - targets: ['customers-service']
+
+  - job_name: 'payments-service'
+    static_configs:
+      - targets: ['payments-service']
+
+  - job_name: 'users-service'
+    static_configs:
+      - targets: ['users-service']
+
+  - job_name: 'wallets-service'
+    static_configs:
+      - targets: ['wallets-service']
+
+  - job_name: 'saga'
+    static_configs:
+      - targets: ['saga']
+
+  - job_name: 'rabbitmq'
+    static_configs:
+      - targets: ['rabbitmq:15692']

@@ -1,0 +1,61 @@
+version: "3.7"
+
+services:
+  api-gateway:
+    build: ../src/APIGateway
+    container_name: api-gateway
+    restart: unless-stopped
+    ports:
+      - 5000:80
+    networks:
+      - inflow
+
+  customers-service:
+    build: ../src/Customers
+    container_name: customers-service
+    restart: unless-stopped
+    ports:
+      - 5010:80 
+    networks:
+      - inflow
+
+  payments-service:
+    build: ../src/Payments
+    container_name: payments-service
+    restart: unless-stopped
+    ports:
+      - 5020:80
+    networks:
+      - inflow
+
+  users-service:
+    build: ../src/Users
+    container_name: users-service
+    restart: unless-stopped
+    ports:
+      - 5030:80
+    networks:
+      - inflow
+
+  wallets-service:
+    build: ../src/Wallets
+    container_name: wallets-service
+    restart: unless-stopped
+    ports:
+      - 5050:80
+    networks:
+      - inflow
+
+  saga:
+    build: ../src/Saga
+    container_name: saga
+    restart: unless-stopped
+    ports:
+      - 5060:80
+    networks:
+      - inflow
+
+networks:
+  inflow:
+    name: inflow-network
+    external: true

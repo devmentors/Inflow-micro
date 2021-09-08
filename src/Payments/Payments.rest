@@ -1,0 +1,59 @@
+@url = http://localhost:5020
+@depositId = 00000000-0000-0000-0000-000000000001
+@withdrawalIban = PL10105000997603123456789123
+@accessToken = secret
+
+
+###
+GET {{url}}/deposits/accounts
+Authorization: Bearer {{accessToken}}
+
+###
+GET {{url}}/deposits
+Authorization: Bearer {{accessToken}}
+
+###
+POST {{url}}/deposits
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "currency": "PLN",
+  "amount": "1000"
+}
+
+###
+PUT {{url}}/deposits/{{depositId}}/complete
+Content-Type: application/json
+
+{
+  "secret": "secret"
+}
+
+###
+GET {{url}}/withdrawals/accounts
+Authorization: Bearer {{accessToken}}
+
+###
+POST {{url}}/withdrawals/accounts
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "currency": "PLN",
+  "iban": "{{withdrawalIban}}"
+}
+
+###
+GET {{url}}/withdrawals
+Authorization: Bearer {{accessToken}}
+
+###
+POST {{url}}/withdrawals
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "currency": "PLN",
+  "amount": "1000"
+}

@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Inflow.Services.Wallets.Application\Inflow.Services.Wallets.Application.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Convey" Version="0.5.*" />
+      <PackageReference Include="Convey.Auth" Version="0.5.*" />
+      <PackageReference Include="Convey.Discovery.Consul" Version="0.5.*" />
+      <PackageReference Include="Convey.LoadBalancing.Fabio" Version="0.5.*" />
+      <PackageReference Include="Convey.HTTP" Version="0.5.*" />
+      <PackageReference Include="Convey.Logging" Version="0.5.*" />
+      <PackageReference Include="Convey.MessageBrokers" Version="0.5.*" />
+      <PackageReference Include="Convey.MessageBrokers.Outbox" Version="0.5.*" />
+      <PackageReference Include="Convey.MessageBrokers.Outbox.EntityFramework" Version="0.5.*" />
+      <PackageReference Include="Convey.MessageBrokers.RabbitMQ" Version="0.5.*" />
+      <PackageReference Include="Convey.Metrics.Prometheus" Version="0.5.*" />
+      <PackageReference Include="Convey.Secrets.Vault" Version="0.5.*" />
+      <PackageReference Include="Convey.Security" Version="0.5.*" />
+      <PackageReference Include="Convey.Tracing.Jaeger" Version="0.5.*" />
+      <PackageReference Include="Convey.Tracing.Jaeger.RabbitMQ" Version="0.5.*" />
+      <PackageReference Include="Convey.WebApi.CQRS" Version="0.5.*" />
+      <PackageReference Include="Convey.WebApi.Security" Version="0.5.*" />
+      <PackageReference Include="Convey.WebApi.Swagger" Version="0.5.*" />
+      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="5.0.10" />
+    </ItemGroup>
+
+</Project>

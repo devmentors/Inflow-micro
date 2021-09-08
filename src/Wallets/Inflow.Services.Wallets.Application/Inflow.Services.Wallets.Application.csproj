@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Inflow.Services.Wallets.Core\Inflow.Services.Wallets.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Convey.CQRS.Commands" Version="0.5.*" />
+      <PackageReference Include="Convey.CQRS.Events" Version="0.5.*" />
+      <PackageReference Include="Convey.CQRS.Queries" Version="0.5.*" />
+      <PackageReference Include="Convey.MessageBrokers.CQRS" Version="0.5.*" />
+    </ItemGroup>
+
+</Project>
