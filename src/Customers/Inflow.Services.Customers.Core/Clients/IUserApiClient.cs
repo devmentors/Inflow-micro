@@ -5,6 +5,7 @@ namespace Inflow.Services.Customers.Core.Clients
 {
     internal interface IUserApiClient
     {
-        Task<UserDto> GetAsync(string email);
+        Task<UserDto> GetUserAsync(string email);
+        Task SubscribeNotificationAsync(string name, string callbackUrl);
     }
 }

@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Convey.CQRS.Commands;
 using Inflow.Services.Users.Core.Entities;
-using Inflow.Services.Users.Core.Events;
 using Inflow.Services.Users.Core.Exceptions;
 using Inflow.Services.Users.Core.Repositories;
 using Inflow.Services.Users.Core.Services;
@@ -17,19 +16,17 @@ namespace Inflow.Services.Users.Core.Commands.Handlers
         private readonly IRoleRepository _roleRepository;
         private readonly IPasswordHasher<User> _passwordHasher;
         private readonly IClock _clock;
-        private readonly IMessageBroker _messageBroker;
         private readonly RegistrationOptions _registrationOptions;
         private readonly ILogger<SignUpHandler> _logger;
 
         public SignUpHandler(IUserRepository userRepository, IRoleRepository roleRepository,
-            IPasswordHasher<User> passwordHasher, IClock clock, IMessageBroker messageBroker,
-            RegistrationOptions registrationOptions, ILogger<SignUpHandler> logger)
+            IPasswordHasher<User> passwordHasher, IClock clock, RegistrationOptions registrationOptions,
+            ILogger<SignUpHandler> logger)
         {
             _userRepository = userRepository;
             _roleRepository = roleRepository;
             _passwordHasher = passwordHasher;
             _clock = clock;
-            _messageBroker = messageBroker;
             _registrationOptions = registrationOptions;
             _logger = logger;
         }
@@ -78,7 +75,6 @@ namespace Inflow.Services.Users.Core.Commands.Handlers
                 State = UserState.Active,
             };
             await _userRepository.AddAsync(user);
-            await _messageBroker.PublishAsync(new SignedUp(user.Id, email, role.Name));
             _logger.LogInformation($"User with ID: '{user.Id}' has signed up.");
         }
     }

@@ -89,6 +89,7 @@ namespace Inflow.Services.Users.Core
                 .AddSingleton<IUserRequestStorage, UserRequestStorage>()
                 .AddSingleton<IPasswordHasher<User>, PasswordHasher<User>>()
                 .AddTransient<IContextFactory, ContextFactory>()
+                .AddTransient<INotificationsRegistry, NotificationsRegistry>()
                 .AddTransient(ctx => ctx.GetRequiredService<IContextFactory>().Create())
                 .AddAuthorization(authorization =>
                 {

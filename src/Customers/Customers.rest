@@ -58,3 +58,12 @@ Content-Type: application/json
 
 {
 }
+
+###
+POST {{url}}/notifications/subscribe
+Content-Type: application/json
+
+{
+  "name": "signed_up",
+  "callbackUrl": "{{url}}/notifications/process"
+}

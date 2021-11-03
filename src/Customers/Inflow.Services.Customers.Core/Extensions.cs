@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Net.Http;
 using System.Runtime.CompilerServices;
 using Convey;
 using Convey.Auth;
@@ -10,7 +11,6 @@ using Convey.Discovery.Consul;
 using Convey.Docs.Swagger;
 using Convey.HTTP;
 using Convey.LoadBalancing.Fabio;
-using Convey.MessageBrokers.CQRS;
 using Convey.MessageBrokers.Outbox;
 using Convey.MessageBrokers.Outbox.EntityFramework;
 using Convey.MessageBrokers.RabbitMQ;
@@ -21,12 +21,10 @@ using Convey.Tracing.Jaeger.RabbitMQ;
 using Convey.WebApi.CQRS;
 using Convey.WebApi.Security;
 using Inflow.Services.Customers.Core.Clients;
-using Inflow.Services.Customers.Core.Commands;
 using Inflow.Services.Customers.Core.Contexts;
 using Inflow.Services.Customers.Core.DAL;
 using Inflow.Services.Customers.Core.DAL.Repositories;
 using Inflow.Services.Customers.Core.Domain.Repositories;
-using Inflow.Services.Customers.Core.Events.External;
 using Inflow.Services.Customers.Core.Infrastructure;
 using Inflow.Services.Customers.Core.Infrastructure.Decorators;
 using Inflow.Services.Customers.Core.Infrastructure.Exceptions;
@@ -37,6 +35,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Polly;
+using Polly.Extensions.Http;
 
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 [assembly: InternalsVisibleTo("Inflow.Services.Customers.Api")]
@@ -82,19 +82,21 @@ namespace Inflow.Services.Customers.Core
                 .AddSingleton<RequestTypeMetricsMiddleware>()
                 .AddScoped<LogContextMiddleware>()
                 .AddSingleton<ICorrelationIdFactory, CorrelationIdFactory>()
-                .AddSingleton<IUserApiClient, UserApiClient>()
                 .AddScoped<ICustomerRepository, CustomerRepository>()
                 .AddTransient<IContextFactory, ContextFactory>()
                 .AddTransient(ctx => ctx.GetRequiredService<IContextFactory>().Create())
                 .AddAuthorization(authorization =>
                 {
                     authorization.AddPolicy("customers", x => x.RequireClaim("permissions", "customers"));
-                });
+                })
+                .AddHttpClient<IUserApiClient, UserApiClient>();
+                // .AddPolicyHandler(HttpPolicyExtensions
+                //         .HandleTransientHttpError()
+                //         .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.NotFound)
+                //         .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))));
 
-            builder.Services.TryDecorate(typeof(ICommandHandler<>), typeof(LoggingCommandHandlerDecorator<>));
-            builder.Services.TryDecorate(typeof(IEventHandler<>), typeof(LoggingEventHandlerDecorator<>));
-            builder.Services.TryDecorate(typeof(ICommandHandler<>), typeof(OutboxCommandHandlerDecorator<>));
-            builder.Services.TryDecorate(typeof(IEventHandler<>), typeof(OutboxEventHandlerDecorator<>));
+                // builder.Services.TryDecorate(typeof(ICommandHandler<>), typeof(OutboxCommandHandlerDecorator<>));
+                // builder.Services.TryDecorate(typeof(IEventHandler<>), typeof(OutboxEventHandlerDecorator<>));
 
             return builder;
         }
@@ -111,10 +113,8 @@ namespace Inflow.Services.Customers.Core
                 .UsePrometheus()
                 .UseCertificateAuthentication()
                 .UseAuthentication()
-                .UseRabbitMq()
-                .SubscribeCommand<CreateCustomer>()
-                .SubscribeEvent<SignedUp>()
-                .SubscribeEvent<UserStateUpdated>();
+                .UseRabbitMq();
+
 
             using var scope = app.ApplicationServices.CreateScope();
             var database = scope.ServiceProvider.GetRequiredService<CustomersDbContext>().Database;
