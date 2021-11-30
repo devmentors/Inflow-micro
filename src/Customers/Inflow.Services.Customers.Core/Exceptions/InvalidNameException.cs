@@ -1,12 +1,11 @@
-﻿namespace Inflow.Services.Customers.Core.Exceptions
-{
-    internal class InvalidNameException : CustomException
-    {
-        public string Name { get; }
+﻿namespace Inflow.Services.Customers.Core.Exceptions;
 
-        public InvalidNameException(string name) : base($"Name: '{name}' is invalid.")
-        {
-            Name = name;
-        }
+internal class InvalidNameException : CustomException
+{
+    public string Name { get; }
+
+    public InvalidNameException(string name) : base($"Name: '{name}' is invalid.")
+    {
+        Name = name;
     }
 }

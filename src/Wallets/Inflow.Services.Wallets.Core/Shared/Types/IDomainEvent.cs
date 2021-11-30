@@ -1,6 +1,5 @@
-﻿namespace Inflow.Services.Wallets.Core.Shared.Types
+﻿namespace Inflow.Services.Wallets.Core.Shared.Types;
+
+internal interface IDomainEvent
 {
-    internal interface IDomainEvent
-    {
-    }
 }

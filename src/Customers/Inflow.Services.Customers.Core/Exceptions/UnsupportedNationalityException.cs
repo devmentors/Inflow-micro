@@ -1,12 +1,11 @@
-﻿namespace Inflow.Services.Customers.Core.Exceptions
-{
-    internal class UnsupportedNationalityException : CustomException
-    {
-        public string Nationality { get; }
+﻿namespace Inflow.Services.Customers.Core.Exceptions;
 
-        public UnsupportedNationalityException(string nationality) : base($"Nationality: '{nationality}' is unsupported.")
-        {
-            Nationality = nationality;
-        }
+internal class UnsupportedNationalityException : CustomException
+{
+    public string Nationality { get; }
+
+    public UnsupportedNationalityException(string nationality) : base($"Nationality: '{nationality}' is unsupported.")
+    {
+        Nationality = nationality;
     }
 }

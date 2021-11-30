@@ -1,9 +1,8 @@
-﻿namespace Inflow.Services.Users.Core.Exceptions
+﻿namespace Inflow.Services.Users.Core.Exceptions;
+
+internal class SignUpDisabledException : CustomException
 {
-    internal class SignUpDisabledException : CustomException
+    public SignUpDisabledException() : base("Sign up is disabled.")
     {
-        public SignUpDisabledException() : base("Sign up is disabled.")
-        {
-        }
     }
 }

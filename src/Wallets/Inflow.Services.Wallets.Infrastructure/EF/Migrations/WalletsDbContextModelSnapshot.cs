@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
+#nullable disable
+
 namespace Inflow.Services.Wallets.Infrastructure.EF.Migrations
 {
     [DbContext(typeof(WalletsDbContext))]
@@ -15,9 +17,10 @@ namespace Inflow.Services.Wallets.Infrastructure.EF.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("Relational:MaxIdentifierLength", 63)
-                .HasAnnotation("ProductVersion", "5.0.10")
-                .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                .HasAnnotation("ProductVersion", "6.0.1")
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Convey.MessageBrokers.Outbox.Messages.InboxMessage", b =>
                 {
@@ -96,7 +99,7 @@ namespace Inflow.Services.Wallets.Infrastructure.EF.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Owners");
+                    b.ToTable("Owners", (string)null);
 
                     b.HasDiscriminator<string>("Type").HasValue("Owner");
                 });
@@ -135,7 +138,7 @@ namespace Inflow.Services.Wallets.Infrastructure.EF.Migrations
 
                     b.HasIndex("WalletId");
 
-                    b.ToTable("Transfers");
+                    b.ToTable("Transfers", (string)null);
 
                     b.HasDiscriminator<string>("Type").HasValue("Transfer");
                 });

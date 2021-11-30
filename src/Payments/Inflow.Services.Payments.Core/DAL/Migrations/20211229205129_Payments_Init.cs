@@ -1,6 +1,8 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
+#nullable disable
+
 namespace Inflow.Services.Payments.Core.DAL.Migrations
 {
     public partial class Payments_Init : Migration
@@ -27,7 +29,7 @@ namespace Inflow.Services.Payments.Core.DAL.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "text", nullable: false),
-                    ProcessedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
+                    ProcessedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -47,8 +49,8 @@ namespace Inflow.Services.Payments.Core.DAL.Migrations
                     MessageContextType = table.Column<string>(type: "text", nullable: true),
                     SerializedMessage = table.Column<string>(type: "text", nullable: true),
                     SerializedMessageContext = table.Column<string>(type: "text", nullable: true),
-                    SentAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
-                    ProcessedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: true)
+                    SentAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    ProcessedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -63,7 +65,7 @@ namespace Inflow.Services.Payments.Core.DAL.Migrations
                     CustomerId = table.Column<Guid>(type: "uuid", nullable: false),
                     Currency = table.Column<string>(type: "text", nullable: false),
                     Iban = table.Column<string>(type: "text", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -84,7 +86,7 @@ namespace Inflow.Services.Payments.Core.DAL.Migrations
                     CustomerId = table.Column<Guid>(type: "uuid", nullable: false),
                     Currency = table.Column<string>(type: "text", nullable: false),
                     Iban = table.Column<string>(type: "text", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -106,8 +108,8 @@ namespace Inflow.Services.Payments.Core.DAL.Migrations
                     AccountId = table.Column<Guid>(type: "uuid", nullable: false),
                     Amount = table.Column<decimal>(type: "numeric", nullable: false),
                     Currency = table.Column<string>(type: "text", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
-                    ProcessedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: true)
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    ProcessedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -129,8 +131,8 @@ namespace Inflow.Services.Payments.Core.DAL.Migrations
                     AccountId = table.Column<Guid>(type: "uuid", nullable: false),
                     Amount = table.Column<decimal>(type: "numeric", nullable: false),
                     Currency = table.Column<string>(type: "text", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
-                    ProcessedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: true)
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    ProcessedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {

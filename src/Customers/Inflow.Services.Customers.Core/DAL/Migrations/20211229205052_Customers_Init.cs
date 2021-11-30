@@ -1,6 +1,8 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
+#nullable disable
+
 namespace Inflow.Services.Customers.Core.DAL.Migrations
 {
     public partial class Customers_Init : Migration
@@ -20,9 +22,9 @@ namespace Inflow.Services.Customers.Core.DAL.Migrations
                     Identity = table.Column<string>(type: "character varying(40)", maxLength: 40, nullable: true),
                     Notes = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
-                    CompletedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
-                    VerifiedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: true)
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CompletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    VerifiedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -34,7 +36,7 @@ namespace Inflow.Services.Customers.Core.DAL.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "text", nullable: false),
-                    ProcessedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
+                    ProcessedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -54,8 +56,8 @@ namespace Inflow.Services.Customers.Core.DAL.Migrations
                     MessageContextType = table.Column<string>(type: "text", nullable: true),
                     SerializedMessage = table.Column<string>(type: "text", nullable: true),
                     SerializedMessageContext = table.Column<string>(type: "text", nullable: true),
-                    SentAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
-                    ProcessedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: true)
+                    SentAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    ProcessedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {

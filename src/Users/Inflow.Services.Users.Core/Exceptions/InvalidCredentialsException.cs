@@ -1,9 +1,8 @@
-﻿namespace Inflow.Services.Users.Core.Exceptions
+﻿namespace Inflow.Services.Users.Core.Exceptions;
+
+internal class InvalidCredentialsException : CustomException
 {
-    internal class InvalidCredentialsException : CustomException
+    public InvalidCredentialsException() : base("Invalid credentials.")
     {
-        public InvalidCredentialsException() : base("Invalid credentials.")
-        {
-        }
     }
 }

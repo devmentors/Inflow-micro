@@ -1,15 +1,14 @@
 ﻿using System;
 using Inflow.Services.Payments.Shared.Exceptions;
 
-namespace Inflow.Services.Payments.Core.Withdrawals.Exceptions
-{
-    internal class WithdrawalNotFoundException : CustomException
-    {
-        public Guid DepositId { get; }
+namespace Inflow.Services.Payments.Core.Withdrawals.Exceptions;
 
-        public WithdrawalNotFoundException(Guid depositId) : base($"Withdrawal with ID: '{depositId}' was not found.")
-        {
-            DepositId = depositId;
-        }
+internal class WithdrawalNotFoundException : CustomException
+{
+    public Guid DepositId { get; }
+
+    public WithdrawalNotFoundException(Guid depositId) : base($"Withdrawal with ID: '{depositId}' was not found.")
+    {
+        DepositId = depositId;
     }
 }

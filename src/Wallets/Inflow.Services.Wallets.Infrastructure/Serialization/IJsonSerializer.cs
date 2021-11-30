@@ -1,8 +1,7 @@
-﻿namespace Inflow.Services.Wallets.Infrastructure.Serialization
+﻿namespace Inflow.Services.Wallets.Infrastructure.Serialization;
+
+internal interface IJsonSerializer
 {
-    internal interface IJsonSerializer
-    {
-        string Serialize<T>(T value);
-        T Deserialize<T>(string value);
-    }
+    string Serialize<T>(T value);
+    T Deserialize<T>(string value);
 }

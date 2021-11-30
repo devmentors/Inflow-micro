@@ -1,9 +1,8 @@
 using System;
 
-namespace Inflow.Saga.Api.Services
+namespace Inflow.Saga.Api.Services;
+
+internal interface IClock
 {
-    internal interface IClock
-    {
-        DateTime CurrentDate();
-    }
+    DateTime CurrentDate();
 }

@@ -41,124 +41,126 @@ using Microsoft.Extensions.DependencyInjection;
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 [assembly: InternalsVisibleTo("Inflow.Services.Customers.Api")]
 
-namespace Inflow.Services.Customers.Core
+namespace Inflow.Services.Customers.Core;
+
+internal static class Extensions
 {
-    internal static class Extensions
+    public static IConveyBuilder AddCore(this IConveyBuilder builder)
     {
-        public static IConveyBuilder AddCore(this IConveyBuilder builder)
-        {
-            builder
-                .AddExceptionToFailedMessageMapper<ExceptionToFailedMessageMapper>()
-                .AddCommandHandlers()
-                .AddEventHandlers()
-                .AddQueryHandlers()
-                .AddInMemoryCommandDispatcher()
-                .AddInMemoryEventDispatcher()
-                .AddInMemoryQueryDispatcher()
-                .AddInMemoryDispatcher()
-                .AddJwt()
-                .AddHttpClient()
-                .AddConsul()
-                .AddFabio()
-                .AddRabbitMq(plugins: p => p.AddJaegerRabbitMqPlugin())
-                .AddMessageOutbox(outbox => outbox.AddEntityFramework<CustomersDbContext>())
-                .AddPrometheus()
-                .AddJaeger()
-                .AddSwaggerDocs()
-                .AddCertificateAuthentication()
-                .AddSecurity()
-                .Build();
+        builder
+            .AddExceptionToFailedMessageMapper<ExceptionToFailedMessageMapper>()
+            .AddCommandHandlers()
+            .AddEventHandlers()
+            .AddQueryHandlers()
+            .AddInMemoryCommandDispatcher()
+            .AddInMemoryEventDispatcher()
+            .AddInMemoryQueryDispatcher()
+            .AddInMemoryDispatcher()
+            .AddJwt()
+            .AddHttpClient()
+            .AddConsul()
+            .AddFabio()
+            .AddRabbitMq(plugins: p => p.AddJaegerRabbitMqPlugin())
+            .AddMessageOutbox(outbox => outbox.AddEntityFramework<CustomersDbContext>())
+            .AddPrometheus()
+            .AddJaeger()
+            .AddSwaggerDocs()
+            .AddCertificateAuthentication()
+            .AddSecurity()
+            .Build();
             
-            var postgresOptions = builder.GetOptions<PostgresOptions>("postgres");
-            builder
-                .Services
-                .AddSingleton(postgresOptions)
-                .AddDbContext<CustomersDbContext>(x => x.UseNpgsql(postgresOptions.ConnectionString))
-                .AddSingleton<ErrorHandlerMiddleware>()
-                .AddSingleton<ExceptionToResponseMapper>()
-                .AddSingleton<IJsonSerializer, SystemTextJsonSerializer>()
-                .AddScoped<IMessageBroker, MessageBroker>()
-                .AddSingleton<IClock, UtcClock>()
-                .AddSingleton<RequestTypeMetricsMiddleware>()
-                .AddScoped<LogContextMiddleware>()
-                .AddSingleton<ICorrelationIdFactory, CorrelationIdFactory>()
-                .AddSingleton<IUserApiClient, UserApiClient>()
-                .AddScoped<ICustomerRepository, CustomerRepository>()
-                .AddTransient<IContextFactory, ContextFactory>()
-                .AddTransient(ctx => ctx.GetRequiredService<IContextFactory>().Create())
-                .AddAuthorization(authorization =>
-                {
-                    authorization.AddPolicy("customers", x => x.RequireClaim("permissions", "customers"));
-                });
+        var postgresOptions = builder.GetOptions<PostgresOptions>("postgres");
+        builder
+            .Services
+            .AddSingleton(postgresOptions)
+            .AddDbContext<CustomersDbContext>(x => x.UseNpgsql(postgresOptions.ConnectionString))
+            .AddSingleton<ErrorHandlerMiddleware>()
+            .AddSingleton<ExceptionToResponseMapper>()
+            .AddSingleton<IJsonSerializer, SystemTextJsonSerializer>()
+            .AddScoped<IMessageBroker, MessageBroker>()
+            .AddSingleton<IClock, UtcClock>()
+            .AddSingleton<RequestTypeMetricsMiddleware>()
+            .AddScoped<LogContextMiddleware>()
+            .AddSingleton<ICorrelationIdFactory, CorrelationIdFactory>()
+            .AddSingleton<IUserApiClient, UserApiClient>()
+            .AddScoped<ICustomerRepository, CustomerRepository>()
+            .AddTransient<IContextFactory, ContextFactory>()
+            .AddTransient(ctx => ctx.GetRequiredService<IContextFactory>().Create())
+            .AddAuthorization(authorization =>
+            {
+                authorization.AddPolicy("customers", x => x.RequireClaim("permissions", "customers"));
+            });
 
-            builder.Services.TryDecorate(typeof(ICommandHandler<>), typeof(LoggingCommandHandlerDecorator<>));
-            builder.Services.TryDecorate(typeof(IEventHandler<>), typeof(LoggingEventHandlerDecorator<>));
-            builder.Services.TryDecorate(typeof(ICommandHandler<>), typeof(OutboxCommandHandlerDecorator<>));
-            builder.Services.TryDecorate(typeof(IEventHandler<>), typeof(OutboxEventHandlerDecorator<>));
+        builder.Services.TryDecorate(typeof(ICommandHandler<>), typeof(LoggingCommandHandlerDecorator<>));
+        builder.Services.TryDecorate(typeof(IEventHandler<>), typeof(LoggingEventHandlerDecorator<>));
+        builder.Services.TryDecorate(typeof(ICommandHandler<>), typeof(OutboxCommandHandlerDecorator<>));
+        builder.Services.TryDecorate(typeof(IEventHandler<>), typeof(OutboxEventHandlerDecorator<>));
 
-            return builder;
-        }
+        return builder;
+    }
 
-        public static IApplicationBuilder UseCore(this IApplicationBuilder app)
-        {
-            app.UseMiddleware<LogContextMiddleware>()
-                .UseJaeger()
-                .UseMiddleware<RequestTypeMetricsMiddleware>()
-                .UseMiddleware<ErrorHandlerMiddleware>()
-                .UseSwaggerDocs()
-                .UseConvey()
-                .UsePublicContracts<ContractAttribute>()
-                .UsePrometheus()
-                .UseCertificateAuthentication()
-                .UseAuthentication()
-                .UseRabbitMq()
-                .SubscribeCommand<CreateCustomer>()
-                .SubscribeEvent<SignedUp>()
-                .SubscribeEvent<UserStateUpdated>();
+    public static IApplicationBuilder UseCore(this IApplicationBuilder app)
+    {
+        app.UseMiddleware<LogContextMiddleware>()
+            .UseJaeger()
+            .UseMiddleware<RequestTypeMetricsMiddleware>()
+            .UseMiddleware<ErrorHandlerMiddleware>()
+            .UseSwaggerDocs()
+            .UseConvey()
+            .UsePublicContracts<ContractAttribute>()
+            .UsePrometheus()
+            .UseCertificateAuthentication()
+            .UseAuthentication()
+            .UseRabbitMq()
+            .SubscribeCommand<CreateCustomer>()
+            .SubscribeEvent<SignedUp>()
+            .SubscribeEvent<UserStateUpdated>();
 
-            using var scope = app.ApplicationServices.CreateScope();
-            var database = scope.ServiceProvider.GetRequiredService<CustomersDbContext>().Database;
-            database.Migrate();
+        using var scope = app.ApplicationServices.CreateScope();
+        var database = scope.ServiceProvider.GetRequiredService<CustomersDbContext>().Database;
+        database.Migrate();
 
-            return app;
-        }
+        // Temporary fix for EF Core issue related to https://github.com/npgsql/efcore.pg/issues/2000
+        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
         
-        internal static CorrelationContext GetCorrelationContext(this IHttpContextAccessor accessor)
-        {
-            if (accessor.HttpContext is null)
-            {
-                return null;
-            }
-
-            if (!accessor.HttpContext.Request.Headers.TryGetValue("x-correlation-context", out var json))
-            {
-                return null;
-            }
-
-            var jsonSerializer = accessor.HttpContext.RequestServices.GetRequiredService<IJsonSerializer>();
-            var value = json.FirstOrDefault();
-
-            return string.IsNullOrWhiteSpace(value) ? null : jsonSerializer.Deserialize<CorrelationContext>(value);
-        }
+        return app;
+    }
         
-        public static string GetUserIpAddress(this HttpContext context)
+    internal static CorrelationContext GetCorrelationContext(this IHttpContextAccessor accessor)
+    {
+        if (accessor.HttpContext is null)
         {
-            if (context is null)
-            {
-                return string.Empty;
-            }
+            return null;
+        }
+
+        if (!accessor.HttpContext.Request.Headers.TryGetValue("x-correlation-context", out var json))
+        {
+            return null;
+        }
+
+        var jsonSerializer = accessor.HttpContext.RequestServices.GetRequiredService<IJsonSerializer>();
+        var value = json.FirstOrDefault();
+
+        return string.IsNullOrWhiteSpace(value) ? null : jsonSerializer.Deserialize<CorrelationContext>(value);
+    }
+        
+    public static string GetUserIpAddress(this HttpContext context)
+    {
+        if (context is null)
+        {
+            return string.Empty;
+        }
             
-            var ipAddress = context.Connection.RemoteIpAddress?.ToString();
-            if (context.Request.Headers.TryGetValue("x-forwarded-for", out var forwardedFor))
+        var ipAddress = context.Connection.RemoteIpAddress?.ToString();
+        if (context.Request.Headers.TryGetValue("x-forwarded-for", out var forwardedFor))
+        {
+            var ipAddresses = forwardedFor.ToString().Split(",", StringSplitOptions.RemoveEmptyEntries);
+            if (ipAddresses.Any())
             {
-                var ipAddresses = forwardedFor.ToString().Split(",", StringSplitOptions.RemoveEmptyEntries);
-                if (ipAddresses.Any())
-                {
-                    ipAddress = ipAddresses[0];
-                }
+                ipAddress = ipAddresses[0];
             }
-
-            return ipAddress ?? string.Empty;
         }
+
+        return ipAddress ?? string.Empty;
     }
 }

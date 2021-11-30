@@ -1,12 +1,11 @@
-﻿namespace Inflow.Services.Payments.Shared.Exceptions
-{
-    internal class InvalidFullNameException : CustomException
-    {
-        public string FullName { get; }
+﻿namespace Inflow.Services.Payments.Shared.Exceptions;
 
-        public InvalidFullNameException(string fullName) : base($"Full name: '{fullName}' is invalid.")
-        {
-            FullName = fullName;
-        }
+internal class InvalidFullNameException : CustomException
+{
+    public string FullName { get; }
+
+    public InvalidFullNameException(string fullName) : base($"Full name: '{fullName}' is invalid.")
+    {
+        FullName = fullName;
     }
 }

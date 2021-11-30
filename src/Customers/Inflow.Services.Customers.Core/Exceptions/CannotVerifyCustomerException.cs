@@ -1,15 +1,14 @@
 ﻿using System;
 
-namespace Inflow.Services.Customers.Core.Exceptions
-{
-    internal class CannotVerifyCustomerException : CustomException
-    {
-        public Guid CustomerId { get; }
+namespace Inflow.Services.Customers.Core.Exceptions;
 
-        public CannotVerifyCustomerException(Guid customerId)
-            : base($"Customer with ID: '{customerId}' cannot be verified.")
-        {
-            CustomerId = customerId;
-        }
+internal class CannotVerifyCustomerException : CustomException
+{
+    public Guid CustomerId { get; }
+
+    public CannotVerifyCustomerException(Guid customerId)
+        : base($"Customer with ID: '{customerId}' cannot be verified.")
+    {
+        CustomerId = customerId;
     }
 }

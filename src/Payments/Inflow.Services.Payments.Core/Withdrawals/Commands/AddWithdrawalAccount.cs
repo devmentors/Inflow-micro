@@ -1,10 +1,9 @@
 ﻿using System;
 using Convey.CQRS.Commands;
 
-namespace Inflow.Services.Payments.Core.Withdrawals.Commands
+namespace Inflow.Services.Payments.Core.Withdrawals.Commands;
+
+public record AddWithdrawalAccount(Guid CustomerId, string Currency, string Iban) : ICommand
 {
-    public record AddWithdrawalAccount(Guid CustomerId, string Currency, string Iban) : ICommand
-    {
-        public Guid AccountId { get; init; } = Guid.NewGuid();
-    }
+    public Guid AccountId { get; init; } = Guid.NewGuid();
 }

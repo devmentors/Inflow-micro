@@ -3,45 +3,44 @@ using Convey.MessageBrokers;
 using Inflow.Services.Users.Core.Infrastructure.Serialization;
 using Microsoft.AspNetCore.Http;
 
-namespace Inflow.Services.Users.Core.Contexts
+namespace Inflow.Services.Users.Core.Contexts;
+
+internal sealed class ContextFactory : IContextFactory
 {
-    internal sealed class ContextFactory : IContextFactory
+    private readonly ICorrelationContextAccessor _contextAccessor;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly ICorrelationIdFactory _correlationIdFactory;
+    private readonly IJsonSerializer _jsonSerializer;
+
+    public ContextFactory(ICorrelationContextAccessor contextAccessor, IHttpContextAccessor httpContextAccessor,
+        ICorrelationIdFactory correlationIdFactory, IJsonSerializer jsonSerializer)
     {
-        private readonly ICorrelationContextAccessor _contextAccessor;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly ICorrelationIdFactory _correlationIdFactory;
-        private readonly IJsonSerializer _jsonSerializer;
+        _contextAccessor = contextAccessor;
+        _httpContextAccessor = httpContextAccessor;
+        _correlationIdFactory = correlationIdFactory;
+        _jsonSerializer = jsonSerializer;
+    }
 
-        public ContextFactory(ICorrelationContextAccessor contextAccessor, IHttpContextAccessor httpContextAccessor,
-            ICorrelationIdFactory correlationIdFactory, IJsonSerializer jsonSerializer)
+    public IContext Create()
+    {
+        var correlationId = _correlationIdFactory.Create();
+        if (_contextAccessor.CorrelationContext is not null)
         {
-            _contextAccessor = contextAccessor;
-            _httpContextAccessor = httpContextAccessor;
-            _correlationIdFactory = correlationIdFactory;
-            _jsonSerializer = jsonSerializer;
+            var payload = _jsonSerializer.Serialize(_contextAccessor.CorrelationContext);
+
+            return string.IsNullOrWhiteSpace(payload)
+                ? new Context(correlationId)
+                : new Context(_jsonSerializer.Deserialize<CorrelationContext>(payload));
         }
 
-        public IContext Create()
+        var correlationContext = _httpContextAccessor.GetCorrelationContext();
+        if (correlationContext is not null)
         {
-            var correlationId = _correlationIdFactory.Create();
-            if (_contextAccessor.CorrelationContext is not null)
-            {
-                var payload = _jsonSerializer.Serialize(_contextAccessor.CorrelationContext);
-
-                return string.IsNullOrWhiteSpace(payload)
-                    ? new Context(correlationId)
-                    : new Context(_jsonSerializer.Deserialize<CorrelationContext>(payload));
-            }
-
-            var correlationContext = _httpContextAccessor.GetCorrelationContext();
-            if (correlationContext is not null)
-            {
-                return new Context(correlationContext);
-            }
-
-            var httpContext = _httpContextAccessor.HttpContext;
-
-            return httpContext is not null ? new Context(httpContext) : new Context(correlationId);
+            return new Context(correlationContext);
         }
+
+        var httpContext = _httpContextAccessor.HttpContext;
+
+        return httpContext is not null ? new Context(httpContext) : new Context(correlationId);
     }
 }

@@ -1,12 +1,11 @@
-﻿namespace Inflow.Services.Customers.Core.Exceptions
+﻿namespace Inflow.Services.Customers.Core.Exceptions;
+
+internal class UserNotFoundException : CustomException
 {
-    internal class UserNotFoundException : CustomException
-    {
-        public string Email { get; }
+    public string Email { get; }
         
-        public UserNotFoundException(string email) : base($"User with email: '{email}' was not found.")
-        {
-            Email = email;
-        }
+    public UserNotFoundException(string email) : base($"User with email: '{email}' was not found.")
+    {
+        Email = email;
     }
 }

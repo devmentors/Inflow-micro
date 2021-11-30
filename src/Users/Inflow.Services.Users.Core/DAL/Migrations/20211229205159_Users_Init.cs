@@ -1,6 +1,8 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
+#nullable disable
+
 namespace Inflow.Services.Users.Core.DAL.Migrations
 {
     public partial class Users_Init : Migration
@@ -70,8 +72,7 @@ namespace Inflow.Services.Users.Core.DAL.Migrations
                         name: "FK_Users_Roles_RoleId",
                         column: x => x.RoleId,
                         principalTable: "Roles",
-                        principalColumn: "Name",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "Name");
                 });
 
             migrationBuilder.CreateIndex(

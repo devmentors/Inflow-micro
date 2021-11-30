@@ -4,13 +4,12 @@ using Inflow.Services.Wallets.Core.Wallets.Entities;
 using Inflow.Services.Wallets.Core.Wallets.Types;
 using Inflow.Services.Wallets.Core.Wallets.ValueObjects;
 
-namespace Inflow.Services.Wallets.Core.Wallets.Repositories
+namespace Inflow.Services.Wallets.Core.Wallets.Repositories;
+
+internal interface IWalletRepository
 {
-    internal interface IWalletRepository
-    {
-        Task<Wallet> GetAsync(WalletId id);
-        Task<Wallet> GetAsync(OwnerId ownerId, Currency currency);
-        Task AddAsync(Wallet wallet);
-        Task UpdateAsync(Wallet wallet);
-    }
+    Task<Wallet> GetAsync(WalletId id);
+    Task<Wallet> GetAsync(OwnerId ownerId, Currency currency);
+    Task AddAsync(Wallet wallet);
+    Task UpdateAsync(Wallet wallet);
 }

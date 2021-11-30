@@ -6,39 +6,38 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace Inflow.Saga.Api
+namespace Inflow.Saga.Api;
+
+public class Startup
 {
-    public class Startup
+    private readonly string _appName;
+
+    public Startup(IConfiguration configuration)
     {
-        private readonly string _appName;
-
-        public Startup(IConfiguration configuration)
-        {
-            _appName = configuration["app:name"];
-        }
+        _appName = configuration["app:name"];
+    }
         
-        public void ConfigureServices(IServiceCollection services)
+    public void ConfigureServices(IServiceCollection services)
+    {
+        services
+            .AddConvey()
+            .AddCore()
+            .Build();
+    }
+
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    {
+        if (env.IsDevelopment())
         {
-            services
-                .AddConvey()
-                .AddCore()
-                .Build();
+            app.UseDeveloperExceptionPage();
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        app.UseCore();
+        app.UseRouting();
+        app.UseAuthorization();
+        app.UseEndpoints(endpoints =>
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-
-            app.UseCore();
-            app.UseRouting();
-            app.UseAuthorization();
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapGet("/", context => context.Response.WriteAsync(_appName));
-            });
-        }
+            endpoints.MapGet("/", context => context.Response.WriteAsync(_appName));
+        });
     }
 }

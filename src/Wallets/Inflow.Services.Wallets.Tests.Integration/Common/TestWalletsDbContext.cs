@@ -1,11 +1,10 @@
 ﻿using Inflow.Services.Wallets.Infrastructure.EF;
 using Inflow.Services.Wallets.Tests.Shared;
 
-namespace Inflow.Services.Wallets.Tests.Integration.Common
+namespace Inflow.Services.Wallets.Tests.Integration.Common;
+
+internal class TestWalletsDbContext : TestDbContext<WalletsDbContext>
 {
-    internal class TestWalletsDbContext : TestDbContext<WalletsDbContext>
-    {
-        protected override WalletsDbContext Init(string connectionString)
-            => new(DbHelper.GetOptions<WalletsDbContext>());
-    }
+    protected override WalletsDbContext Init(string connectionString)
+        => new(DbHelper.GetOptions<WalletsDbContext>());
 }

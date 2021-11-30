@@ -1,11 +1,10 @@
 ﻿using System;
 
-namespace Inflow.Services.Wallets.Application.Exceptions
+namespace Inflow.Services.Wallets.Application.Exceptions;
+
+internal abstract class AppException : Exception
 {
-    internal abstract class AppException : Exception
+    protected AppException(string message) : base(message)
     {
-        protected AppException(string message) : base(message)
-        {
-        }
     }
 }

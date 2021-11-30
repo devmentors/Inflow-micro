@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
     </PropertyGroup>
 
     <ItemGroup>
@@ -9,10 +9,10 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Convey.CQRS.Commands" Version="0.5.*" />
-      <PackageReference Include="Convey.CQRS.Events" Version="0.5.*" />
-      <PackageReference Include="Convey.CQRS.Queries" Version="0.5.*" />
-      <PackageReference Include="Convey.MessageBrokers.CQRS" Version="0.5.*" />
+      <PackageReference Include="Convey.CQRS.Commands" Version="1.0.531" />
+      <PackageReference Include="Convey.CQRS.Events" Version="1.0.531" />
+      <PackageReference Include="Convey.CQRS.Queries" Version="1.0.531" />
+      <PackageReference Include="Convey.MessageBrokers.CQRS" Version="1.0.531" />
     </ItemGroup>
 
 </Project>

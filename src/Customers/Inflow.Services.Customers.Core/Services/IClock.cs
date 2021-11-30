@@ -1,9 +1,8 @@
 using System;
 
-namespace Inflow.Services.Customers.Core.Services
+namespace Inflow.Services.Customers.Core.Services;
+
+internal interface IClock
 {
-    internal interface IClock
-    {
-        DateTime CurrentDate();
-    }
+    DateTime CurrentDate();
 }

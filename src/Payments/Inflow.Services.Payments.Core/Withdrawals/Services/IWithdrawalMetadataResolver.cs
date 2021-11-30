@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace Inflow.Services.Payments.Core.Withdrawals.Services
+namespace Inflow.Services.Payments.Core.Withdrawals.Services;
+
+internal interface IWithdrawalMetadataResolver
 {
-    internal interface IWithdrawalMetadataResolver
-    {
-        Guid? TryResolveWithdrawalId(string metadata);
-    }
+    Guid? TryResolveWithdrawalId(string metadata);
 }

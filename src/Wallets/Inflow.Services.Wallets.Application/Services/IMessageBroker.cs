@@ -1,10 +1,9 @@
 using System.Threading.Tasks;
 using Convey.CQRS.Events;
 
-namespace Inflow.Services.Wallets.Application.Services
+namespace Inflow.Services.Wallets.Application.Services;
+
+internal interface IMessageBroker
 {
-    internal interface IMessageBroker
-    {
-        Task PublishAsync(params IEvent[] events);
-    }
+    Task PublishAsync(params IEvent[] events);
 }

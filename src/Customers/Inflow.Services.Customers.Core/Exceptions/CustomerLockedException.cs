@@ -1,15 +1,14 @@
 ﻿using System;
 
-namespace Inflow.Services.Customers.Core.Exceptions
-{
-    internal class CustomerLockedException : CustomException
-    {
-        public Guid CustomerId { get; }
+namespace Inflow.Services.Customers.Core.Exceptions;
 
-        public CustomerLockedException(Guid customerId)
-            : base($"Customer with ID: '{customerId}' is locked.")
-        {
-            CustomerId = customerId;
-        }
+internal class CustomerLockedException : CustomException
+{
+    public Guid CustomerId { get; }
+
+    public CustomerLockedException(Guid customerId)
+        : base($"Customer with ID: '{customerId}' is locked.")
+    {
+        CustomerId = customerId;
     }
 }

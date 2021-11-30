@@ -7,41 +7,40 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace Inflow.Services.Payments.Api
+namespace Inflow.Services.Payments.Api;
+
+public class Startup
 {
-    public class Startup
+    private readonly string _appName;
+
+    public Startup(IConfiguration configuration)
     {
-        private readonly string _appName;
-
-        public Startup(IConfiguration configuration)
-        {
-            _appName = configuration["app:name"];
-        }
+        _appName = configuration["app:name"];
+    }
         
-        public void ConfigureServices(IServiceCollection services)
+    public void ConfigureServices(IServiceCollection services)
+    {
+        services.AddControllers();
+        services
+            .AddConvey()
+            .AddCore()
+            .Build();
+    }
+
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    {
+        if (env.IsDevelopment())
         {
-            services.AddControllers();
-            services
-                .AddConvey()
-                .AddCore()
-                .Build();
+            app.UseDeveloperExceptionPage();
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            if (env.IsDevelopment())
+        app.UseCore()
+            .UseRouting()
+            .UseAuthorization()
+            .UseEndpoints(endpoints =>
             {
-                app.UseDeveloperExceptionPage();
-            }
-
-            app.UseCore()
-                .UseRouting()
-                .UseAuthorization()
-                .UseEndpoints(endpoints =>
-                {
-                    endpoints.MapGet("/", context => context.Response.WriteAsync(_appName));
-                    endpoints.MapControllers();
-                });
-        }
+                endpoints.MapGet("/", context => context.Response.WriteAsync(_appName));
+                endpoints.MapControllers();
+            });
     }
 }

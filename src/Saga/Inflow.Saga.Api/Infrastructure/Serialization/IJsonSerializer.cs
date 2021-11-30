@@ -1,8 +1,7 @@
-﻿namespace Inflow.Saga.Api.Infrastructure.Serialization
+﻿namespace Inflow.Saga.Api.Infrastructure.Serialization;
+
+internal interface IJsonSerializer
 {
-    internal interface IJsonSerializer
-    {
-        string Serialize<T>(T value);
-        T Deserialize<T>(string value);
-    }
+    string Serialize<T>(T value);
+    T Deserialize<T>(string value);
 }

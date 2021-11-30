@@ -1,7 +1,6 @@
-namespace Inflow.Services.Payments.Core.Contexts
+namespace Inflow.Services.Payments.Core.Contexts;
+
+internal interface IContextFactory
 {
-    internal interface IContextFactory
-    {
-        IContext Create();
-    }
+    IContext Create();
 }

@@ -1,11 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
-      <TargetFramework>net5.0</TargetFramework>
+      <TargetFramework>net6.0</TargetFramework>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.11">
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.2">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
@@ -13,26 +13,26 @@
 
     <ItemGroup>
       <PackageReference Include="Chronicle_" Version="3.2.1" />
-      <PackageReference Include="Convey" Version="0.5.*" />
-      <PackageReference Include="Convey.Auth" Version="0.5.*" />
-      <PackageReference Include="Convey.CQRS.Commands" Version="0.5.*" />
-      <PackageReference Include="Convey.CQRS.Events" Version="0.5.*" />
-      <PackageReference Include="Convey.CQRS.Queries" Version="0.5.*" />
-      <PackageReference Include="Convey.Discovery.Consul" Version="0.5.*" />
-      <PackageReference Include="Convey.LoadBalancing.Fabio" Version="0.5.*" />
-      <PackageReference Include="Convey.HTTP" Version="0.5.*" />
-      <PackageReference Include="Convey.Logging" Version="0.5.*" />
-      <PackageReference Include="Convey.MessageBrokers" Version="0.5.*" />
-      <PackageReference Include="Convey.MessageBrokers.CQRS" Version="0.5.*" />
-      <PackageReference Include="Convey.MessageBrokers.RabbitMQ" Version="0.5.*" />
-      <PackageReference Include="Convey.Metrics.Prometheus" Version="0.5.*" />
-      <PackageReference Include="Convey.Secrets.Vault" Version="0.5.*" />
-      <PackageReference Include="Convey.Security" Version="0.5.*" />
-      <PackageReference Include="Convey.Tracing.Jaeger" Version="0.5.*" />
-      <PackageReference Include="Convey.Tracing.Jaeger.RabbitMQ" Version="0.5.*" />
-      <PackageReference Include="Convey.WebApi.CQRS" Version="0.5.*" />
-      <PackageReference Include="Convey.WebApi.Security" Version="0.5.*" />
-      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="5.0.10" />
+      <PackageReference Include="Convey" Version="1.0.531" />
+      <PackageReference Include="Convey.Auth" Version="1.0.531" />
+      <PackageReference Include="Convey.CQRS.Commands" Version="1.0.531" />
+      <PackageReference Include="Convey.CQRS.Events" Version="1.0.531" />
+      <PackageReference Include="Convey.CQRS.Queries" Version="1.0.531" />
+      <PackageReference Include="Convey.Discovery.Consul" Version="1.0.531" />
+      <PackageReference Include="Convey.LoadBalancing.Fabio" Version="1.0.531" />
+      <PackageReference Include="Convey.HTTP" Version="1.0.531" />
+      <PackageReference Include="Convey.Logging" Version="1.0.531" />
+      <PackageReference Include="Convey.MessageBrokers" Version="1.0.531" />
+      <PackageReference Include="Convey.MessageBrokers.CQRS" Version="1.0.531" />
+      <PackageReference Include="Convey.MessageBrokers.RabbitMQ" Version="1.0.531" />
+      <PackageReference Include="Convey.Metrics.Prometheus" Version="1.0.531" />
+      <PackageReference Include="Convey.Secrets.Vault" Version="1.0.531" />
+      <PackageReference Include="Convey.Security" Version="1.0.531" />
+      <PackageReference Include="Convey.Tracing.Jaeger" Version="1.0.531" />
+      <PackageReference Include="Convey.Tracing.Jaeger.RabbitMQ" Version="1.0.531" />
+      <PackageReference Include="Convey.WebApi.CQRS" Version="1.0.531" />
+      <PackageReference Include="Convey.WebApi.Security" Version="1.0.531" />
+      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.3" />
     </ItemGroup>
 
 </Project>

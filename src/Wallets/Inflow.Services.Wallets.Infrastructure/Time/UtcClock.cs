@@ -1,10 +1,9 @@
 using System;
 using Inflow.Services.Wallets.Application.Services;
 
-namespace Inflow.Services.Wallets.Infrastructure.Time
+namespace Inflow.Services.Wallets.Infrastructure.Time;
+
+internal sealed class UtcClock : IClock
 {
-    internal sealed class UtcClock : IClock
-    {
-        public DateTime CurrentDate()  => DateTime.UtcNow;
-    }
+    public DateTime CurrentDate()  => DateTime.UtcNow;
 }

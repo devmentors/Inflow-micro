@@ -1,9 +1,8 @@
-namespace Inflow.Services.Users.Core.Exceptions
+namespace Inflow.Services.Users.Core.Exceptions;
+
+internal class EmailInUseException : CustomException
 {
-    internal class EmailInUseException : CustomException
+    public EmailInUseException() : base("Email is already in use.")
     {
-        public EmailInUseException() : base("Email is already in use.")
-        {
-        }
     }
 }

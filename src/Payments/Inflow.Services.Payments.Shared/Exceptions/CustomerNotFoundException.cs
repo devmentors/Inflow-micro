@@ -1,15 +1,14 @@
 ﻿using System;
 
-namespace Inflow.Services.Payments.Shared.Exceptions
-{
-    internal class CustomerNotFoundException : CustomException
-    {
-        public Guid CustomerId { get; }
+namespace Inflow.Services.Payments.Shared.Exceptions;
 
-        public CustomerNotFoundException(Guid customerId)
-            : base($"Customer with ID: '{customerId}' was not found.")
-        {
-            CustomerId = customerId;
-        }
+internal class CustomerNotFoundException : CustomException
+{
+    public Guid CustomerId { get; }
+
+    public CustomerNotFoundException(Guid customerId)
+        : base($"Customer with ID: '{customerId}' was not found.")
+    {
+        CustomerId = customerId;
     }
 }

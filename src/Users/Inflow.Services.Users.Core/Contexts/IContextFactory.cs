@@ -1,7 +1,6 @@
-namespace Inflow.Services.Users.Core.Contexts
+namespace Inflow.Services.Users.Core.Contexts;
+
+internal interface IContextFactory
 {
-    internal interface IContextFactory
-    {
-        IContext Create();
-    }
+    IContext Create();
 }

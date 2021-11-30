@@ -20,124 +20,123 @@ using Microsoft.Extensions.Hosting;
 using OpenTracing;
 using Yarp.ReverseProxy.Transforms;
 
-namespace Inflow.APIGateway
+namespace Inflow.APIGateway;
+
+public class Startup
 {
-    public class Startup
+    private readonly IConfiguration _configuration;
+    private readonly string _appName;
+
+    public Startup(IConfiguration configuration)
     {
-        private readonly IConfiguration _configuration;
-        private readonly string _appName;
-
-        public Startup(IConfiguration configuration)
-        {
-            _configuration = configuration;
-            _appName = configuration["app:name"];
-        }
+        _configuration = configuration;
+        _appName = configuration["app:name"];
+    }
         
-        public void ConfigureServices(IServiceCollection services)
+    public void ConfigureServices(IServiceCollection services)
+    {
+        services
+            .AddConvey()
+            .AddJaeger()
+            .AddJwt()
+            .AddPrometheus()
+            .AddRabbitMq(plugins: p => p.AddJaegerRabbitMqPlugin())
+            .AddSecurity()
+            .Build();
+            
+        services.AddScoped<LogContextMiddleware>();
+        services.AddScoped<UserMiddleware>();
+        services.AddScoped<MessagingMiddleware>();
+        services.AddSingleton<IJsonSerializer, SystemTextJsonSerializer>();
+        services.AddSingleton<ICorrelationIdFactory, CorrelationIdFactory>();
+        services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+        services.AddSingleton<ICorrelationContextBuilder, CorrelationContextBuilder>();
+        services.AddSingleton<RouteMatcher>();
+        services.Configure<MessagingOptions>(_configuration.GetSection("messaging"));
+            
+        services.AddAuthorization(options =>
         {
-            services
-                .AddConvey()
-                .AddJaeger()
-                .AddJwt()
-                .AddPrometheus()
-                .AddRabbitMq(plugins: p => p.AddJaegerRabbitMqPlugin())
-                .AddSecurity()
-                .Build();
-            
-            services.AddScoped<LogContextMiddleware>();
-            services.AddScoped<UserMiddleware>();
-            services.AddScoped<MessagingMiddleware>();
-            services.AddSingleton<IJsonSerializer, SystemTextJsonSerializer>();
-            services.AddSingleton<ICorrelationIdFactory, CorrelationIdFactory>();
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.AddSingleton<ICorrelationContextBuilder, CorrelationContextBuilder>();
-            services.AddSingleton<RouteMatcher>();
-            services.Configure<MessagingOptions>(_configuration.GetSection("messaging"));
-            
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy("authenticatedUser", policy =>
-                    policy.RequireAuthenticatedUser());
-            });
+            options.AddPolicy("authenticatedUser", policy =>
+                policy.RequireAuthenticatedUser());
+        });
 
-            services.AddCors(cors =>
+        services.AddCors(cors =>
+        {
+            cors.AddPolicy("cors", x =>
             {
-                cors.AddPolicy("cors", x =>
-                {
-                    x.WithOrigins("*")
-                        .WithMethods("POST", "PUT", "DELETE")
-                        .WithHeaders("Content-Type", "Authorization");
-                });
+                x.WithOrigins("*")
+                    .WithMethods("POST", "PUT", "DELETE")
+                    .WithHeaders("Content-Type", "Authorization");
             });
+        });
             
-            services.AddReverseProxy()
-                .LoadFromConfig(_configuration.GetSection("reverseProxy"))
-                .AddTransforms(builderContext =>
+        services.AddReverseProxy()
+            .LoadFromConfig(_configuration.GetSection("reverseProxy"))
+            .AddTransforms(builderContext =>
+            {
+                builderContext.AddRequestTransform(transformContext =>
                 {
-                    builderContext.AddRequestTransform(transformContext =>
+                    var correlationIdFactory = transformContext
+                        .HttpContext
+                        .RequestServices
+                        .GetRequiredService<ICorrelationIdFactory>();
+
+                    var correlationId = correlationIdFactory.Create();
+                    transformContext.ProxyRequest.Headers.Add("x-correlation-id", correlationId);
+                        
+                    var tracer = transformContext
+                        .HttpContext
+                        .RequestServices
+                        .GetRequiredService<ITracer>();
+                        
+                    var span = tracer?.ActiveSpan?.Context?.ToString();
+                    if (!string.IsNullOrWhiteSpace(span))
                     {
-                        var correlationIdFactory = transformContext
-                            .HttpContext
-                            .RequestServices
-                            .GetRequiredService<ICorrelationIdFactory>();
+                        transformContext.ProxyRequest.Headers.Add("uber-trace-id", span);
+                    }
 
-                        var correlationId = correlationIdFactory.Create();
-                        transformContext.ProxyRequest.Headers.Add("x-correlation-id", correlationId);
+                    var correlationContextBuilder = transformContext
+                        .HttpContext
+                        .RequestServices
+                        .GetRequiredService<ICorrelationContextBuilder>();
                         
-                        var tracer = transformContext
-                            .HttpContext
-                            .RequestServices
-                            .GetRequiredService<ITracer>();
+                    var jsonSerializer = transformContext
+                        .HttpContext
+                        .RequestServices
+                        .GetRequiredService<IJsonSerializer>();
                         
-                        var span = tracer?.ActiveSpan?.Context?.ToString();
-                        if (!string.IsNullOrWhiteSpace(span))
-                        {
-                            transformContext.ProxyRequest.Headers.Add("uber-trace-id", span);
-                        }
-
-                        var correlationContextBuilder = transformContext
-                            .HttpContext
-                            .RequestServices
-                            .GetRequiredService<ICorrelationContextBuilder>();
+                    var correlationContext = correlationContextBuilder.Build(transformContext.HttpContext, correlationId, span);
+                    transformContext.ProxyRequest.Headers.Add("x-correlation-context", jsonSerializer.Serialize(correlationContext));
                         
-                        var jsonSerializer = transformContext
-                            .HttpContext
-                            .RequestServices
-                            .GetRequiredService<IJsonSerializer>();
-                        
-                        var correlationContext = correlationContextBuilder.Build(transformContext.HttpContext, correlationId, span);
-                        transformContext.ProxyRequest.Headers.Add("x-correlation-context", jsonSerializer.Serialize(correlationContext));
-                        
-                        return ValueTask.CompletedTask;
-                    });
+                    return ValueTask.CompletedTask;
                 });
-        }
-
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-
-            app.UseJaeger();
-            app.UseMiddleware<LogContextMiddleware>();
-            app.UseCors("cors");
-            app.UseConvey();
-            app.UsePrometheus();
-            app.UseAccessTokenValidator();
-            app.UseAuthentication();
-            app.UseRabbitMq();
-            app.UseMiddleware<UserMiddleware>();
-            app.UseMiddleware<MessagingMiddleware>();
-            app.UseRouting();
-            app.UseAuthorization();
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapGet("/", context => context.Response.WriteAsync(_appName));
-                endpoints.MapReverseProxy();
             });
+    }
+
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    {
+        if (env.IsDevelopment())
+        {
+            app.UseDeveloperExceptionPage();
         }
+
+        app.UseJaeger();
+        app.UseMiddleware<LogContextMiddleware>();
+        app.UseCors("cors");
+        app.UseConvey();
+        app.UsePrometheus();
+        app.UseAccessTokenValidator();
+        app.UseAuthentication();
+        app.UseRabbitMq();
+        app.UseMiddleware<UserMiddleware>();
+        app.UseMiddleware<MessagingMiddleware>();
+        app.UseRouting();
+        app.UseAuthorization();
+
+        app.UseEndpoints(endpoints =>
+        {
+            endpoints.MapGet("/", context => context.Response.WriteAsync(_appName));
+            endpoints.MapReverseProxy();
+        });
     }
 }

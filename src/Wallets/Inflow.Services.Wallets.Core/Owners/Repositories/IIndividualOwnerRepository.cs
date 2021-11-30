@@ -2,12 +2,11 @@
 using Inflow.Services.Wallets.Core.Owners.Entities;
 using Inflow.Services.Wallets.Core.Owners.Types;
 
-namespace Inflow.Services.Wallets.Core.Owners.Repositories
+namespace Inflow.Services.Wallets.Core.Owners.Repositories;
+
+internal interface IIndividualOwnerRepository
 {
-    internal interface IIndividualOwnerRepository
-    {
-        Task<IndividualOwner> GetAsync(OwnerId id);
-        Task AddAsync(IndividualOwner owner);
-        Task UpdateAsync(IndividualOwner owner);
-    }
+    Task<IndividualOwner> GetAsync(OwnerId id);
+    Task AddAsync(IndividualOwner owner);
+    Task UpdateAsync(IndividualOwner owner);
 }

@@ -47,136 +47,138 @@ using Microsoft.Extensions.DependencyInjection;
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 [assembly: InternalsVisibleTo("Inflow.Services.Payments.Api")]
 
-namespace Inflow.Services.Payments.Core
+namespace Inflow.Services.Payments.Core;
+
+internal static class Extensions
 {
-    internal static class Extensions
+    public static IConveyBuilder AddCore(this IConveyBuilder builder)
     {
-        public static IConveyBuilder AddCore(this IConveyBuilder builder)
-        {
-            builder
-                .AddExceptionToFailedMessageMapper<ExceptionToFailedMessageMapper>()
-                .AddCommandHandlers()
-                .AddEventHandlers()
-                .AddQueryHandlers()
-                .AddInMemoryCommandDispatcher()
-                .AddInMemoryEventDispatcher()
-                .AddInMemoryQueryDispatcher()
-                .AddInMemoryDispatcher()
-                .AddJwt()
-                .AddHttpClient()
-                .AddConsul()
-                .AddFabio()
-                .AddRabbitMq(plugins: p => p.AddJaegerRabbitMqPlugin())
-                .AddMessageOutbox(outbox => outbox.AddEntityFramework<PaymentsDbContext>())
-                .AddPrometheus()
-                .AddJaeger()
-                .AddSwaggerDocs()
-                .AddCertificateAuthentication()
-                .AddSecurity()
-                .Build();
+        builder
+            .AddExceptionToFailedMessageMapper<ExceptionToFailedMessageMapper>()
+            .AddCommandHandlers()
+            .AddEventHandlers()
+            .AddQueryHandlers()
+            .AddInMemoryCommandDispatcher()
+            .AddInMemoryEventDispatcher()
+            .AddInMemoryQueryDispatcher()
+            .AddInMemoryDispatcher()
+            .AddJwt()
+            .AddHttpClient()
+            .AddConsul()
+            .AddFabio()
+            .AddRabbitMq(plugins: p => p.AddJaegerRabbitMqPlugin())
+            .AddMessageOutbox(outbox => outbox.AddEntityFramework<PaymentsDbContext>())
+            .AddPrometheus()
+            .AddJaeger()
+            .AddSwaggerDocs()
+            .AddCertificateAuthentication()
+            .AddSecurity()
+            .Build();
             
-            var postgresOptions = builder.GetOptions<PostgresOptions>("postgres");
-            builder
-                .Services
-                .AddSingleton(postgresOptions)
-                .AddDbContext<PaymentsDbContext>(x => x.UseNpgsql(postgresOptions.ConnectionString))
-                .AddSingleton<ErrorHandlerMiddleware>()
-                .AddSingleton<ExceptionToResponseMapper>()
-                .AddSingleton<IJsonSerializer, SystemTextJsonSerializer>()
-                .AddScoped<IMessageBroker, MessageBroker>()
-                .AddSingleton<IClock, UtcClock>()
-                .AddSingleton<RequestTypeMetricsMiddleware>()
-                .AddScoped<LogContextMiddleware>()
-                .AddSingleton<ICorrelationIdFactory, CorrelationIdFactory>()
-                .AddTransient<IContextFactory, ContextFactory>()
-                .AddTransient(ctx => ctx.GetRequiredService<IContextFactory>().Create())
-                .AddSingleton<IWithdrawalMetadataResolver, WithdrawalMetadataResolver>()
-                .AddScoped<ICustomerRepository, CustomerRepository>()
-                .AddScoped<IDepositRepository, DepositRepository>()
-                .AddScoped<IDepositAccountRepository, DepositAccountRepository>()
-                .AddScoped<IWithdrawalRepository, WithdrawalRepository>()
-                .AddScoped<IWithdrawalAccountRepository, WithdrawalAccountRepository>()
-                .AddSingleton<ICurrencyResolver, CurrencyResolver>()
-                .AddSingleton<IDepositAccountFactory, DepositAccountFactory>()
-                .AddAuthorization(authorization =>
-                {
-                    authorization.AddPolicy("deposits", x => x.RequireClaim("permissions", "deposits"));
-                    authorization.AddPolicy("withdrawals", x => x.RequireClaim("permissions", "withdrawals"));
-                });
-
-            builder.Services.TryDecorate(typeof(ICommandHandler<>), typeof(LoggingCommandHandlerDecorator<>));
-            builder.Services.TryDecorate(typeof(IEventHandler<>), typeof(LoggingEventHandlerDecorator<>));
-            builder.Services.TryDecorate(typeof(ICommandHandler<>), typeof(OutboxCommandHandlerDecorator<>));
-            builder.Services.TryDecorate(typeof(IEventHandler<>), typeof(OutboxEventHandlerDecorator<>));
-
-            return builder;
-        }
-
-        public static IApplicationBuilder UseCore(this IApplicationBuilder app)
-        {
-            app.UseMiddleware<LogContextMiddleware>()
-                .UseJaeger()
-                .UseMiddleware<RequestTypeMetricsMiddleware>()
-                .UseMiddleware<ErrorHandlerMiddleware>()
-                .UseSwaggerDocs()
-                .UseConvey()
-                .UsePublicContracts<ContractAttribute>()
-                .UsePrometheus()
-                .UseCertificateAuthentication()
-                .UseAuthentication()
-                .UseRabbitMq()
-                .SubscribeCommand<StartDeposit>()
-                .SubscribeCommand<StartWithdrawal>()
-                .SubscribeEvent<CustomerCompleted>()
-                .SubscribeEvent<CustomerLocked>()
-                .SubscribeEvent<CustomerUnlocked>()
-                .SubscribeEvent<CustomerVerified>()
-                .SubscribeEvent<DeductFundsRejected>()
-                .SubscribeEvent<FundsDeducted>();
-
-            using var scope = app.ApplicationServices.CreateScope();
-            var database = scope.ServiceProvider.GetRequiredService<PaymentsDbContext>().Database;
-            database.Migrate();
-
-            return app;
-        }
-        
-        internal static CorrelationContext GetCorrelationContext(this IHttpContextAccessor accessor)
-        {
-            if (accessor.HttpContext is null)
+        var postgresOptions = builder.GetOptions<PostgresOptions>("postgres");
+        builder
+            .Services
+            .AddSingleton(postgresOptions)
+            .AddDbContext<PaymentsDbContext>(x => x.UseNpgsql(postgresOptions.ConnectionString))
+            .AddSingleton<ErrorHandlerMiddleware>()
+            .AddSingleton<ExceptionToResponseMapper>()
+            .AddSingleton<IJsonSerializer, SystemTextJsonSerializer>()
+            .AddScoped<IMessageBroker, MessageBroker>()
+            .AddSingleton<IClock, UtcClock>()
+            .AddSingleton<RequestTypeMetricsMiddleware>()
+            .AddScoped<LogContextMiddleware>()
+            .AddSingleton<ICorrelationIdFactory, CorrelationIdFactory>()
+            .AddTransient<IContextFactory, ContextFactory>()
+            .AddTransient(ctx => ctx.GetRequiredService<IContextFactory>().Create())
+            .AddSingleton<IWithdrawalMetadataResolver, WithdrawalMetadataResolver>()
+            .AddScoped<ICustomerRepository, CustomerRepository>()
+            .AddScoped<IDepositRepository, DepositRepository>()
+            .AddScoped<IDepositAccountRepository, DepositAccountRepository>()
+            .AddScoped<IWithdrawalRepository, WithdrawalRepository>()
+            .AddScoped<IWithdrawalAccountRepository, WithdrawalAccountRepository>()
+            .AddSingleton<ICurrencyResolver, CurrencyResolver>()
+            .AddSingleton<IDepositAccountFactory, DepositAccountFactory>()
+            .AddAuthorization(authorization =>
             {
-                return null;
-            }
+                authorization.AddPolicy("deposits", x => x.RequireClaim("permissions", "deposits"));
+                authorization.AddPolicy("withdrawals", x => x.RequireClaim("permissions", "withdrawals"));
+            });
 
-            if (!accessor.HttpContext.Request.Headers.TryGetValue("x-correlation-context", out var json))
-            {
-                return null;
-            }
-
-            var jsonSerializer = accessor.HttpContext.RequestServices.GetRequiredService<IJsonSerializer>();
-            var value = json.FirstOrDefault();
-
-            return string.IsNullOrWhiteSpace(value) ? null : jsonSerializer.Deserialize<CorrelationContext>(value);
-        }
-        
-        public static string GetUserIpAddress(this HttpContext context)
-        {
-            if (context is null)
-            {
-                return string.Empty;
-            }
+        builder.Services.TryDecorate(typeof(ICommandHandler<>), typeof(LoggingCommandHandlerDecorator<>));
+        builder.Services.TryDecorate(typeof(IEventHandler<>), typeof(LoggingEventHandlerDecorator<>));
+        builder.Services.TryDecorate(typeof(ICommandHandler<>), typeof(OutboxCommandHandlerDecorator<>));
+        builder.Services.TryDecorate(typeof(IEventHandler<>), typeof(OutboxEventHandlerDecorator<>));
             
-            var ipAddress = context.Connection.RemoteIpAddress?.ToString();
-            if (context.Request.Headers.TryGetValue("x-forwarded-for", out var forwardedFor))
-            {
-                var ipAddresses = forwardedFor.ToString().Split(",", StringSplitOptions.RemoveEmptyEntries);
-                if (ipAddresses.Any())
-                {
-                    ipAddress = ipAddresses[0];
-                }
-            }
+        return builder;
+    }
 
-            return ipAddress ?? string.Empty;
+    public static IApplicationBuilder UseCore(this IApplicationBuilder app)
+    {
+        app.UseMiddleware<LogContextMiddleware>()
+            .UseJaeger()
+            .UseMiddleware<RequestTypeMetricsMiddleware>()
+            .UseMiddleware<ErrorHandlerMiddleware>()
+            .UseSwaggerDocs()
+            .UseConvey()
+            .UsePublicContracts<ContractAttribute>()
+            .UsePrometheus()
+            .UseCertificateAuthentication()
+            .UseAuthentication()
+            .UseRabbitMq()
+            .SubscribeCommand<StartDeposit>()
+            .SubscribeCommand<StartWithdrawal>()
+            .SubscribeEvent<CustomerCompleted>()
+            .SubscribeEvent<CustomerLocked>()
+            .SubscribeEvent<CustomerUnlocked>()
+            .SubscribeEvent<CustomerVerified>()
+            .SubscribeEvent<DeductFundsRejected>()
+            .SubscribeEvent<FundsDeducted>();
+
+        using var scope = app.ApplicationServices.CreateScope();
+        var database = scope.ServiceProvider.GetRequiredService<PaymentsDbContext>().Database;
+        database.Migrate();
+
+        // Temporary fix for EF Core issue related to https://github.com/npgsql/efcore.pg/issues/2000
+        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+        
+        return app;
+    }
+        
+    internal static CorrelationContext GetCorrelationContext(this IHttpContextAccessor accessor)
+    {
+        if (accessor.HttpContext is null)
+        {
+            return null;
         }
+
+        if (!accessor.HttpContext.Request.Headers.TryGetValue("x-correlation-context", out var json))
+        {
+            return null;
+        }
+
+        var jsonSerializer = accessor.HttpContext.RequestServices.GetRequiredService<IJsonSerializer>();
+        var value = json.FirstOrDefault();
+
+        return string.IsNullOrWhiteSpace(value) ? null : jsonSerializer.Deserialize<CorrelationContext>(value);
+    }
+        
+    public static string GetUserIpAddress(this HttpContext context)
+    {
+        if (context is null)
+        {
+            return string.Empty;
+        }
+            
+        var ipAddress = context.Connection.RemoteIpAddress?.ToString();
+        if (context.Request.Headers.TryGetValue("x-forwarded-for", out var forwardedFor))
+        {
+            var ipAddresses = forwardedFor.ToString().Split(",", StringSplitOptions.RemoveEmptyEntries);
+            if (ipAddresses.Any())
+            {
+                ipAddress = ipAddresses[0];
+            }
+        }
+
+        return ipAddress ?? string.Empty;
     }
 }

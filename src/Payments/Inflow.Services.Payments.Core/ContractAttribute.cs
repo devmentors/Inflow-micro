@@ -1,9 +1,8 @@
 using System;
 
-namespace Inflow.Services.Payments.Core
+namespace Inflow.Services.Payments.Core;
+
+// Marker
+internal class ContractAttribute : Attribute
 {
-    // Marker
-    internal class ContractAttribute : Attribute
-    {
-    }
 }

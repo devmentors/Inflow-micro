@@ -2,10 +2,9 @@
 using Inflow.Services.Payments.Core.Deposits.Domain.Entities;
 using Inflow.Services.Payments.Shared.ValueObjects;
 
-namespace Inflow.Services.Payments.Core.Deposits.Domain.Factories
+namespace Inflow.Services.Payments.Core.Deposits.Domain.Factories;
+
+internal interface IDepositAccountFactory
 {
-    internal interface IDepositAccountFactory
-    {
-        DepositAccount Create(Guid customerId, Nationality nationality, Currency currency);
-    }
+    DepositAccount Create(Guid customerId, Nationality nationality, Currency currency);
 }

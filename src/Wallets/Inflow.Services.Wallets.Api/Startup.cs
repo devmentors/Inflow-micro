@@ -8,42 +8,41 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace Inflow.Services.Wallets.Api
+namespace Inflow.Services.Wallets.Api;
+
+public class Startup
 {
-    public class Startup
+    private readonly string _appName;
+
+    public Startup(IConfiguration configuration)
     {
-        private readonly string _appName;
-
-        public Startup(IConfiguration configuration)
-        {
-            _appName = configuration["app:name"];
-        }
+        _appName = configuration["app:name"];
+    }
         
-        public void ConfigureServices(IServiceCollection services)
+    public void ConfigureServices(IServiceCollection services)
+    {
+        services.AddControllers();
+        services
+            .AddConvey()
+            .AddApplication()
+            .AddInfrastructure()
+            .Build();
+    }
+
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    {
+        if (env.IsDevelopment())
         {
-            services.AddControllers();
-            services
-                .AddConvey()
-                .AddApplication()
-                .AddInfrastructure()
-                .Build();
+            app.UseDeveloperExceptionPage();
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            if (env.IsDevelopment())
+        app.UseInfrastructure()
+            .UseRouting()
+            .UseAuthorization()
+            .UseEndpoints(endpoints =>
             {
-                app.UseDeveloperExceptionPage();
-            }
-
-            app.UseInfrastructure()
-                .UseRouting()
-                .UseAuthorization()
-                .UseEndpoints(endpoints =>
-                {
-                    endpoints.MapGet("/", context => context.Response.WriteAsync(_appName));
-                    endpoints.MapControllers();
-                });
-        }
+                endpoints.MapGet("/", context => context.Response.WriteAsync(_appName));
+                endpoints.MapControllers();
+            });
     }
 }

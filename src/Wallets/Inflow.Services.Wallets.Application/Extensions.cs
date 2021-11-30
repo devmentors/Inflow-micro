@@ -9,13 +9,12 @@ using Convey;
 [assembly: InternalsVisibleTo("Inflow.Services.Wallets.Tests.Unit")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 
-namespace Inflow.Services.Wallets.Application
+namespace Inflow.Services.Wallets.Application;
+
+internal static class Extensions
 {
-    internal static class Extensions
+    public static IConveyBuilder AddApplication(this IConveyBuilder builder)
     {
-        public static IConveyBuilder AddApplication(this IConveyBuilder builder)
-        {
-            return builder;
-        }
+        return builder;
     }
 }

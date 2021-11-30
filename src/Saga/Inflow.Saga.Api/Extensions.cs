@@ -25,62 +25,59 @@ using Microsoft.Extensions.DependencyInjection;
 
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 
-namespace Inflow.Saga.Api
+namespace Inflow.Saga.Api;
+
+internal static class Extensions
 {
-    internal static class Extensions
+    public static IConveyBuilder AddCore(this IConveyBuilder builder)
     {
-        public static IConveyBuilder AddCore(this IConveyBuilder builder)
-        {
-            builder
-                .AddCommandHandlers()
-                .AddEventHandlers()
-                .AddQueryHandlers()
-                .AddInMemoryCommandDispatcher()
-                .AddInMemoryEventDispatcher()
-                .AddInMemoryQueryDispatcher()
-                .AddInMemoryDispatcher()
-                .AddHttpClient()
-                .AddConsul()
-                .AddFabio()
-                .AddRabbitMq(plugins: p => p.AddJaegerRabbitMqPlugin())
-                .AddPrometheus()
-                .AddJaeger()
-                .AddCertificateAuthentication()
-                .AddSecurity()
-                .Build();
-            
-            builder
-                .Services
-                .AddChronicle()
-                .AddSingleton<IHttpContextAccessor, HttpContextAccessor>()
-                .AddSingleton<IJsonSerializer, SystemTextJsonSerializer>()
-                .AddScoped<IMessageBroker, MessageBroker>()
-                .AddSingleton<IClock, UtcClock>()
-                .AddSingleton<ICorrelationIdFactory, CorrelationIdFactory>()
-                .AddAuthorization(authorization =>
-                {
-                    authorization.AddPolicy("deposits", x => x.RequireClaim("permissions", "deposits"));
-                    authorization.AddPolicy("withdrawals", x => x.RequireClaim("permissions", "withdrawals"));
-                });
+        builder
+            .AddCommandHandlers()
+            .AddEventHandlers()
+            .AddQueryHandlers()
+            .AddInMemoryCommandDispatcher()
+            .AddInMemoryEventDispatcher()
+            .AddInMemoryQueryDispatcher()
+            .AddInMemoryDispatcher()
+            .AddHttpClient()
+            .AddConsul()
+            .AddFabio()
+            .AddRabbitMq(plugins: p => p.AddJaegerRabbitMqPlugin())
+            .AddPrometheus()
+            .AddJaeger()
+            .AddCertificateAuthentication()
+            .AddSecurity()
+            .Build();
 
-            return builder;
-        }
+        builder
+            .Services
+            .AddChronicle()
+            .AddSingleton<IHttpContextAccessor, HttpContextAccessor>()
+            .AddSingleton<IJsonSerializer, SystemTextJsonSerializer>()
+            .AddScoped<IMessageBroker, MessageBroker>()
+            .AddSingleton<IClock, UtcClock>()
+            .AddSingleton<ICorrelationIdFactory, CorrelationIdFactory>()
+            .AddAuthorization(authorization =>
+            {
+                authorization.AddPolicy("deposits", x => x.RequireClaim("permissions", "deposits"));
+                authorization.AddPolicy("withdrawals", x => x.RequireClaim("permissions", "withdrawals"));
+            });
 
-        public static IApplicationBuilder UseCore(this IApplicationBuilder app)
-        {
-            app.UseJaeger()
-                .UseConvey()
-                .UsePrometheus()
-                .UseCertificateAuthentication()
-                .UseRabbitMq()
-                .SubscribeEvent<CustomerCompleted>()
-                .SubscribeEvent<CustomerVerified>()
-                .SubscribeEvent<DepositCompleted>()
-                .SubscribeEvent<FundsAdded>()
-                .SubscribeEvent<SignedUp>()
-                .SubscribeEvent<WalletAdded>();
+        return builder;
+    }
 
-            return app;
-        }
+    public static IApplicationBuilder UseCore(this IApplicationBuilder app)
+    {
+        app.UseJaeger()
+            .UseConvey()
+            .UsePrometheus()
+            .UseCertificateAuthentication()
+            .UseRabbitMq()
+            .SubscribeEvent<CustomerVerified>()
+            .SubscribeEvent<DepositCompleted>()
+            .SubscribeEvent<FundsAdded>()
+            .SubscribeEvent<WalletAdded>();
+
+        return app;
     }
 }

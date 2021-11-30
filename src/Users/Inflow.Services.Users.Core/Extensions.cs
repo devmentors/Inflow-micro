@@ -39,129 +39,131 @@ using Microsoft.Extensions.DependencyInjection;
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 [assembly: InternalsVisibleTo("Inflow.Services.Users.Api")]
 
-namespace Inflow.Services.Users.Core
+namespace Inflow.Services.Users.Core;
+
+internal static class Extensions
 {
-    internal static class Extensions
+    public static IConveyBuilder AddCore(this IConveyBuilder builder)
     {
-        public static IConveyBuilder AddCore(this IConveyBuilder builder)
-        {
-            builder
-                .AddExceptionToFailedMessageMapper<ExceptionToFailedMessageMapper>()
-                .AddCommandHandlers()
-                .AddEventHandlers()
-                .AddQueryHandlers()
-                .AddInMemoryCommandDispatcher()
-                .AddInMemoryEventDispatcher()
-                .AddInMemoryQueryDispatcher()
-                .AddInMemoryDispatcher()
-                .AddJwt()
-                .AddHttpClient()
-                .AddConsul()
-                .AddFabio()
-                .AddRabbitMq(plugins: p => p.AddJaegerRabbitMqPlugin())
-                .AddMessageOutbox(outbox => outbox.AddEntityFramework<UsersDbContext>())
-                .AddPrometheus()
-                .AddJaeger()
-                .AddSwaggerDocs()
-                .AddCertificateAuthentication()
-                .AddSecurity()
-                .Build();
+        builder
+            .AddExceptionToFailedMessageMapper<ExceptionToFailedMessageMapper>()
+            .AddCommandHandlers()
+            .AddEventHandlers()
+            .AddQueryHandlers()
+            .AddInMemoryCommandDispatcher()
+            .AddInMemoryEventDispatcher()
+            .AddInMemoryQueryDispatcher()
+            .AddInMemoryDispatcher()
+            .AddJwt()
+            .AddHttpClient()
+            .AddConsul()
+            .AddFabio()
+            .AddRabbitMq(plugins: p => p.AddJaegerRabbitMqPlugin())
+            .AddMessageOutbox(outbox => outbox.AddEntityFramework<UsersDbContext>())
+            .AddPrometheus()
+            .AddJaeger()
+            .AddSwaggerDocs()
+            .AddCertificateAuthentication()
+            .AddSecurity()
+            .Build();
             
-            var postgresOptions = builder.GetOptions<PostgresOptions>("postgres");
-            var registrationOptions = builder.GetOptions<RegistrationOptions>("registration");
+        var postgresOptions = builder.GetOptions<PostgresOptions>("postgres");
+        var registrationOptions = builder.GetOptions<RegistrationOptions>("registration");
             
-            builder
-                .Services
-                .AddSingleton(postgresOptions)
-                .AddSingleton(registrationOptions)
-                .AddScoped<UsersInitializer>()
-                .AddDbContext<UsersDbContext>(x => x.UseNpgsql(postgresOptions.ConnectionString))
-                .AddSingleton<ErrorHandlerMiddleware>()
-                .AddSingleton<ExceptionToResponseMapper>()
-                .AddSingleton<IJsonSerializer, SystemTextJsonSerializer>()
-                .AddScoped<IMessageBroker, MessageBroker>()
-                .AddSingleton<IClock, UtcClock>()
-                .AddSingleton<RequestTypeMetricsMiddleware>()
-                .AddScoped<LogContextMiddleware>()
-                .AddSingleton<ICorrelationIdFactory, CorrelationIdFactory>()
-                .AddScoped<IRoleRepository, RoleRepository>()
-                .AddScoped<IUserRepository, UserRepository>()
-                .AddSingleton<IUserRequestStorage, UserRequestStorage>()
-                .AddSingleton<IPasswordHasher<User>, PasswordHasher<User>>()
-                .AddTransient<IContextFactory, ContextFactory>()
-                .AddTransient(ctx => ctx.GetRequiredService<IContextFactory>().Create())
-                .AddAuthorization(authorization =>
-                {
-                    authorization.AddPolicy("users", x => x.RequireClaim("permissions", "users"));
-                });
+        builder
+            .Services
+            .AddSingleton(postgresOptions)
+            .AddSingleton(registrationOptions)
+            .AddScoped<UsersInitializer>()
+            .AddDbContext<UsersDbContext>(x => x.UseNpgsql(postgresOptions.ConnectionString))
+            .AddSingleton<ErrorHandlerMiddleware>()
+            .AddSingleton<ExceptionToResponseMapper>()
+            .AddSingleton<IJsonSerializer, SystemTextJsonSerializer>()
+            .AddScoped<IMessageBroker, MessageBroker>()
+            .AddSingleton<IClock, UtcClock>()
+            .AddSingleton<RequestTypeMetricsMiddleware>()
+            .AddScoped<LogContextMiddleware>()
+            .AddSingleton<ICorrelationIdFactory, CorrelationIdFactory>()
+            .AddScoped<IRoleRepository, RoleRepository>()
+            .AddScoped<IUserRepository, UserRepository>()
+            .AddSingleton<IUserRequestStorage, UserRequestStorage>()
+            .AddSingleton<IPasswordHasher<User>, PasswordHasher<User>>()
+            .AddTransient<IContextFactory, ContextFactory>()
+            .AddTransient(ctx => ctx.GetRequiredService<IContextFactory>().Create())
+            .AddAuthorization(authorization =>
+            {
+                authorization.AddPolicy("users", x => x.RequireClaim("permissions", "users"));
+            });
 
-            builder.Services.TryDecorate(typeof(ICommandHandler<>), typeof(LoggingCommandHandlerDecorator<>));
-            builder.Services.TryDecorate(typeof(IEventHandler<>), typeof(LoggingEventHandlerDecorator<>));
-            builder.Services.TryDecorate(typeof(ICommandHandler<>), typeof(OutboxCommandHandlerDecorator<>));
-            builder.Services.TryDecorate(typeof(IEventHandler<>), typeof(OutboxEventHandlerDecorator<>));
+        builder.Services.TryDecorate(typeof(ICommandHandler<>), typeof(LoggingCommandHandlerDecorator<>));
+        builder.Services.TryDecorate(typeof(IEventHandler<>), typeof(LoggingEventHandlerDecorator<>));
+        builder.Services.TryDecorate(typeof(ICommandHandler<>), typeof(OutboxCommandHandlerDecorator<>));
+        builder.Services.TryDecorate(typeof(IEventHandler<>), typeof(OutboxEventHandlerDecorator<>));
 
-            return builder;
-        }
-
-        public static IApplicationBuilder UseCore(this IApplicationBuilder app)
-        {
-            app.UseMiddleware<LogContextMiddleware>()
-                .UseJaeger()
-                .UseMiddleware<RequestTypeMetricsMiddleware>()
-                .UseMiddleware<ErrorHandlerMiddleware>()
-                .UseSwaggerDocs()
-                .UseConvey()
-                .UsePublicContracts<ContractAttribute>()
-                .UsePrometheus()
-                .UseCertificateAuthentication()
-                .UseAuthentication()
-                .UseRabbitMq();
-
-            using var scope = app.ApplicationServices.CreateScope();
-            var database = scope.ServiceProvider.GetRequiredService<UsersDbContext>().Database;
-            database.Migrate();
-            var initializer = scope.ServiceProvider.GetRequiredService<UsersInitializer>();
-            initializer.InitAsync().GetAwaiter().GetResult();
-
-            return app;
-        }
+        // Temporary fix for EF Core issue related to https://github.com/npgsql/efcore.pg/issues/2000
+        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
         
-        internal static CorrelationContext GetCorrelationContext(this IHttpContextAccessor accessor)
-        {
-            if (accessor.HttpContext is null)
-            {
-                return null;
-            }
+        return builder;
+    }
 
-            if (!accessor.HttpContext.Request.Headers.TryGetValue("x-correlation-context", out var json))
-            {
-                return null;
-            }
+    public static IApplicationBuilder UseCore(this IApplicationBuilder app)
+    {
+        app.UseMiddleware<LogContextMiddleware>()
+            .UseJaeger()
+            .UseMiddleware<RequestTypeMetricsMiddleware>()
+            .UseMiddleware<ErrorHandlerMiddleware>()
+            .UseSwaggerDocs()
+            .UseConvey()
+            .UsePublicContracts<ContractAttribute>()
+            .UsePrometheus()
+            .UseCertificateAuthentication()
+            .UseAuthentication()
+            .UseRabbitMq();
 
-            var jsonSerializer = accessor.HttpContext.RequestServices.GetRequiredService<IJsonSerializer>();
-            var value = json.FirstOrDefault();
+        using var scope = app.ApplicationServices.CreateScope();
+        var database = scope.ServiceProvider.GetRequiredService<UsersDbContext>().Database;
+        database.Migrate();
+        var initializer = scope.ServiceProvider.GetRequiredService<UsersInitializer>();
+        initializer.InitAsync().GetAwaiter().GetResult();
 
-            return string.IsNullOrWhiteSpace(value) ? null : jsonSerializer.Deserialize<CorrelationContext>(value);
-        }
+        return app;
+    }
         
-        public static string GetUserIpAddress(this HttpContext context)
+    internal static CorrelationContext GetCorrelationContext(this IHttpContextAccessor accessor)
+    {
+        if (accessor.HttpContext is null)
         {
-            if (context is null)
-            {
-                return string.Empty;
-            }
-            
-            var ipAddress = context.Connection.RemoteIpAddress?.ToString();
-            if (context.Request.Headers.TryGetValue("x-forwarded-for", out var forwardedFor))
-            {
-                var ipAddresses = forwardedFor.ToString().Split(",", StringSplitOptions.RemoveEmptyEntries);
-                if (ipAddresses.Any())
-                {
-                    ipAddress = ipAddresses[0];
-                }
-            }
-
-            return ipAddress ?? string.Empty;
+            return null;
         }
+
+        if (!accessor.HttpContext.Request.Headers.TryGetValue("x-correlation-context", out var json))
+        {
+            return null;
+        }
+
+        var jsonSerializer = accessor.HttpContext.RequestServices.GetRequiredService<IJsonSerializer>();
+        var value = json.FirstOrDefault();
+
+        return string.IsNullOrWhiteSpace(value) ? null : jsonSerializer.Deserialize<CorrelationContext>(value);
+    }
+        
+    public static string GetUserIpAddress(this HttpContext context)
+    {
+        if (context is null)
+        {
+            return string.Empty;
+        }
+            
+        var ipAddress = context.Connection.RemoteIpAddress?.ToString();
+        if (context.Request.Headers.TryGetValue("x-forwarded-for", out var forwardedFor))
+        {
+            var ipAddresses = forwardedFor.ToString().Split(",", StringSplitOptions.RemoveEmptyEntries);
+            if (ipAddresses.Any())
+            {
+                ipAddress = ipAddresses[0];
+            }
+        }
+
+        return ipAddress ?? string.Empty;
     }
 }

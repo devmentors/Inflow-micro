@@ -1,7 +1,6 @@
-﻿namespace Inflow.Services.Customers.Core.DAL
+﻿namespace Inflow.Services.Customers.Core.DAL;
+
+internal class PostgresOptions
 {
-    internal class PostgresOptions
-    {
-        public string ConnectionString { get; set; }
-    }
+    public string ConnectionString { get; set; }
 }

@@ -1,7 +1,6 @@
-﻿namespace Inflow.Services.Wallets.Infrastructure.EF
+﻿namespace Inflow.Services.Wallets.Infrastructure.EF;
+
+internal class PostgresOptions
 {
-    internal class PostgresOptions
-    {
-        public string ConnectionString { get; set; }
-    }
+    public string ConnectionString { get; set; }
 }
