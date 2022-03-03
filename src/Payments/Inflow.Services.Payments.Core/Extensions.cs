@@ -23,7 +23,6 @@ using Convey.WebApi.Security;
 using Inflow.Services.Payments.Core.Contexts;
 using Inflow.Services.Payments.Core.DAL;
 using Inflow.Services.Payments.Core.DAL.Repositories;
-using Inflow.Services.Payments.Core.Deposits.Commands;
 using Inflow.Services.Payments.Core.Deposits.Domain.Factories;
 using Inflow.Services.Payments.Core.Deposits.Domain.Repositories;
 using Inflow.Services.Payments.Core.Deposits.Domain.Services;
@@ -34,7 +33,6 @@ using Inflow.Services.Payments.Core.Infrastructure.Exceptions;
 using Inflow.Services.Payments.Core.Infrastructure.Logging;
 using Inflow.Services.Payments.Core.Infrastructure.Serialization;
 using Inflow.Services.Payments.Core.Services;
-using Inflow.Services.Payments.Core.Withdrawals.Commands;
 using Inflow.Services.Payments.Core.Withdrawals.Domain.Repositories;
 using Inflow.Services.Payments.Core.Withdrawals.Events.External;
 using Inflow.Services.Payments.Core.Withdrawals.Services;
@@ -125,12 +123,9 @@ internal static class Extensions
             .UseCertificateAuthentication()
             .UseAuthentication()
             .UseRabbitMq()
-            .SubscribeCommand<StartDeposit>()
-            .SubscribeCommand<StartWithdrawal>()
             .SubscribeEvent<CustomerCompleted>()
             .SubscribeEvent<CustomerLocked>()
             .SubscribeEvent<CustomerUnlocked>()
-            .SubscribeEvent<CustomerVerified>()
             .SubscribeEvent<DeductFundsRejected>()
             .SubscribeEvent<FundsDeducted>();
 

@@ -10,7 +10,6 @@ using Convey.Discovery.Consul;
 using Convey.Docs.Swagger;
 using Convey.HTTP;
 using Convey.LoadBalancing.Fabio;
-using Convey.MessageBrokers.CQRS;
 using Convey.MessageBrokers.Outbox;
 using Convey.MessageBrokers.Outbox.EntityFramework;
 using Convey.MessageBrokers.RabbitMQ;
@@ -20,13 +19,10 @@ using Convey.Tracing.Jaeger;
 using Convey.Tracing.Jaeger.RabbitMQ;
 using Convey.WebApi.CQRS;
 using Convey.WebApi.Security;
-using Inflow.Services.Customers.Core.Clients;
-using Inflow.Services.Customers.Core.Commands;
 using Inflow.Services.Customers.Core.Contexts;
 using Inflow.Services.Customers.Core.DAL;
 using Inflow.Services.Customers.Core.DAL.Repositories;
 using Inflow.Services.Customers.Core.Domain.Repositories;
-using Inflow.Services.Customers.Core.Events.External;
 using Inflow.Services.Customers.Core.Infrastructure;
 using Inflow.Services.Customers.Core.Infrastructure.Decorators;
 using Inflow.Services.Customers.Core.Infrastructure.Exceptions;
@@ -48,7 +44,6 @@ internal static class Extensions
     public static IConveyBuilder AddCore(this IConveyBuilder builder)
     {
         builder
-            .AddExceptionToFailedMessageMapper<ExceptionToFailedMessageMapper>()
             .AddCommandHandlers()
             .AddEventHandlers()
             .AddQueryHandlers()
@@ -58,12 +53,7 @@ internal static class Extensions
             .AddInMemoryDispatcher()
             .AddJwt()
             .AddHttpClient()
-            .AddConsul()
-            .AddFabio()
-            .AddRabbitMq(plugins: p => p.AddJaegerRabbitMqPlugin())
-            .AddMessageOutbox(outbox => outbox.AddEntityFramework<CustomersDbContext>())
-            .AddPrometheus()
-            .AddJaeger()
+            .AddRabbitMq()
             .AddSwaggerDocs()
             .AddCertificateAuthentication()
             .AddSecurity()
@@ -82,7 +72,6 @@ internal static class Extensions
             .AddSingleton<RequestTypeMetricsMiddleware>()
             .AddScoped<LogContextMiddleware>()
             .AddSingleton<ICorrelationIdFactory, CorrelationIdFactory>()
-            .AddSingleton<IUserApiClient, UserApiClient>()
             .AddScoped<ICustomerRepository, CustomerRepository>()
             .AddTransient<IContextFactory, ContextFactory>()
             .AddTransient(ctx => ctx.GetRequiredService<IContextFactory>().Create())
@@ -91,8 +80,6 @@ internal static class Extensions
                 authorization.AddPolicy("customers", x => x.RequireClaim("permissions", "customers"));
             });
 
-        builder.Services.TryDecorate(typeof(ICommandHandler<>), typeof(LoggingCommandHandlerDecorator<>));
-        builder.Services.TryDecorate(typeof(IEventHandler<>), typeof(LoggingEventHandlerDecorator<>));
         builder.Services.TryDecorate(typeof(ICommandHandler<>), typeof(OutboxCommandHandlerDecorator<>));
         builder.Services.TryDecorate(typeof(IEventHandler<>), typeof(OutboxEventHandlerDecorator<>));
 
@@ -102,19 +89,13 @@ internal static class Extensions
     public static IApplicationBuilder UseCore(this IApplicationBuilder app)
     {
         app.UseMiddleware<LogContextMiddleware>()
-            .UseJaeger()
             .UseMiddleware<RequestTypeMetricsMiddleware>()
             .UseMiddleware<ErrorHandlerMiddleware>()
             .UseSwaggerDocs()
             .UseConvey()
-            .UsePublicContracts<ContractAttribute>()
-            .UsePrometheus()
             .UseCertificateAuthentication()
             .UseAuthentication()
-            .UseRabbitMq()
-            .SubscribeCommand<CreateCustomer>()
-            .SubscribeEvent<SignedUp>()
-            .SubscribeEvent<UserStateUpdated>();
+            .UseRabbitMq();
 
         using var scope = app.ApplicationServices.CreateScope();
         var database = scope.ServiceProvider.GetRequiredService<CustomersDbContext>().Database;
