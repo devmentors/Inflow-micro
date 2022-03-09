@@ -54,6 +54,7 @@ internal static class Extensions
             .AddInMemoryDispatcher()
             .AddJwt()
             .AddHttpClient()
+            .AddConsul()
             .AddRabbitMq()
             .AddSwaggerDocs()
             .AddCertificateAuthentication()
