@@ -19,6 +19,7 @@ using Convey.Tracing.Jaeger;
 using Convey.Tracing.Jaeger.RabbitMQ;
 using Convey.WebApi.CQRS;
 using Convey.WebApi.Security;
+using Inflow.Services.Customers.Core.Clients;
 using Inflow.Services.Customers.Core.Contexts;
 using Inflow.Services.Customers.Core.DAL;
 using Inflow.Services.Customers.Core.DAL.Repositories;
@@ -79,6 +80,8 @@ internal static class Extensions
             {
                 authorization.AddPolicy("customers", x => x.RequireClaim("permissions", "customers"));
             });
+
+        builder.Services.AddSingleton<IUserApiClient, UserApiClient>();
 
         // builder.Services.TryDecorate(typeof(ICommandHandler<>), typeof(OutboxCommandHandlerDecorator<>));
         // builder.Services.TryDecorate(typeof(IEventHandler<>), typeof(OutboxEventHandlerDecorator<>));
