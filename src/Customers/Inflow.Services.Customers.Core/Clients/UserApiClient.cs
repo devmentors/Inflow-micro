@@ -1,23 +1,20 @@
-using System.Net.Http;
-using System.Net.Http.Json;
 using System.Threading.Tasks;
+using Convey.HTTP;
 using Inflow.Services.Customers.Core.Clients.DTO;
 
 namespace Inflow.Services.Customers.Core.Clients;
 
 internal sealed class UserApiClient : IUserApiClient
 {
-    private const string Url = "http://localhost:5030";
-    private readonly IHttpClientFactory _clientFactory;
+    private readonly IHttpClient _client;
+    private readonly string _url;
 
-    public UserApiClient(IHttpClientFactory clientFactory)
+    public UserApiClient(IHttpClient client, HttpClientOptions options)
     {
-        _clientFactory = clientFactory;
+        _client = client;
+        _url = options.Services["users"];
     }
 
     public Task<UserDto> GetAsync(string email)
-    {
-        var client = _clientFactory.CreateClient();
-        return client.GetFromJsonAsync<UserDto>($"{Url}/users/by-email/{email}");
-    }
+        => _client.GetAsync<UserDto>($"{_url}/users/by-email/{email}");
 }

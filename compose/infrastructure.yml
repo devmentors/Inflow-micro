@@ -1,16 +1,16 @@
 version: "3.7"
 
 services:
-  # consul:
-  #   image: consul
-  #   container_name: consul
-  #   restart: unless-stopped
-  #   networks:
-  #     - inflow
-  #   ports:
-  #     - 8500:8500
-  #   # volumes:
-  #   #   - consul:/consul/data
+  consul:
+    image: consul
+    container_name: consul
+    restart: unless-stopped
+    networks:
+      - inflow
+    ports:
+      - 8500:8500
+    # volumes:
+    #   - consul:/consul/data
 
   # fabio:
   #   image: fabiolb/fabio
