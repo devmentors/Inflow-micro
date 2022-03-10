@@ -103,7 +103,8 @@ internal static class Extensions
             .UseCertificateAuthentication()
             .UseAuthentication()
             .UseRabbitMq()
-            .SubscribeEvent<SignedUp>();
+            .SubscribeEvent<SignedUp>()
+            .SubscribeEvent<UserStateUpdated>();
 
         using var scope = app.ApplicationServices.CreateScope();
         var database = scope.ServiceProvider.GetRequiredService<CustomersDbContext>().Database;

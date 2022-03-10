@@ -14,13 +14,15 @@ internal sealed class SignedUpHandler : IEventHandler<SignedUp>
 {
     private readonly ICustomerRepository _customerRepository;
     private readonly IClock _clock;
+    private readonly IMessageBroker _messageBroker;
     private readonly ILogger<CreateCustomerHandler> _logger;
 
-    public SignedUpHandler(ICustomerRepository customerRepository, IClock clock,
+    public SignedUpHandler(ICustomerRepository customerRepository, IClock clock, IMessageBroker messageBroker,
         ILogger<CreateCustomerHandler> logger)
     {
         _customerRepository = customerRepository;
         _clock = clock;
+        _messageBroker = messageBroker;
         _logger = logger;
     }
     
@@ -39,6 +41,7 @@ internal sealed class SignedUpHandler : IEventHandler<SignedUp>
         
         var customer = new Customer(customerId, @event.Email, _clock.CurrentDate());
         await _customerRepository.AddAsync(customer);
+        await _messageBroker.PublishAsync(new CustomerCreated(customerId));
         _logger.LogInformation($"Created a customer with ID: '{customer.Id}'.");
     }
 }
