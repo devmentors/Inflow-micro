@@ -55,6 +55,7 @@ internal static class Extensions
             .AddJwt()
             .AddHttpClient()
             .AddConsul()
+            .AddFabio()
             .AddRabbitMq()
             .AddSwaggerDocs()
             .AddCertificateAuthentication()

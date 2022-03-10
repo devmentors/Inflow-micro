@@ -12,17 +12,17 @@ services:
     # volumes:
     #   - consul:/consul/data
 
-  # fabio:
-  #   image: fabiolb/fabio
-  #   container_name: fabio
-  #   restart: unless-stopped
-  #   environment:
-  #   - FABIO_REGISTRY_CONSUL_ADDR=consul:8500
-  #   networks:
-  #     - inflow
-  #   ports:
-  #   - 9998:9998
-  #   - 9999:9999
+  fabio:
+    image: fabiolb/fabio
+    container_name: fabio
+    restart: unless-stopped
+    environment:
+    - FABIO_REGISTRY_CONSUL_ADDR=consul:8500
+    networks:
+      - inflow
+    ports:
+    - 9998:9998
+    - 9999:9999
 
   # grafana:
   #   image: grafana/grafana
