@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Inflow.Services.Wallets.Core.Owners.Types;
 using Inflow.Services.Wallets.Core.Shared.Types;
+using Inflow.Services.Wallets.Core.Wallets.Exceptions;
 using Inflow.Services.Wallets.Core.Wallets.Types;
 using Inflow.Services.Wallets.Core.Wallets.ValueObjects;
 
@@ -52,10 +54,50 @@ internal class Wallet : AggregateRoot<WalletId>
     }
 
     public IncomingTransfer AddFunds(TransferId transferId, Amount amount, DateTime createdAt,
-        TransferName name = null, TransferMetadata metadata = null) => default;
+        TransferName name = null, TransferMetadata metadata = null)
+    {
+        if (amount <= 0)
+        {
+            throw new InvalidTransferAmountException(amount);
+        }
+
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            name = "add_funds";
+        }
+
+        var transfer = new IncomingTransfer(transferId, Id, Currency, amount, createdAt, name, metadata);
+        _transfers.Add(transfer);
+        IncrementVersion();
+
+        return transfer;
+    }
 
     public OutgoingTransfer DeductFunds(TransferId transferId, Amount amount, DateTime createdAt,
-        TransferName name = null, TransferMetadata metadata = null) => default;
+        TransferName name = null, TransferMetadata metadata = null)
+    {
+        if (amount <= 0)
+        {
+            throw new InvalidTransferAmountException(amount);
+        }
 
-    public Amount CurrentAmount() =>  default;
+        if (CurrentAmount() < amount)
+        {
+            throw new InsufficientWalletFundsException(Id);
+        }
+
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            name = "deduct_funds";
+        }
+
+        var transfer = new OutgoingTransfer(transferId, Id, Currency, amount, createdAt, name, metadata);
+        _transfers.Add(transfer);
+        IncrementVersion();
+
+        return transfer;
+    }    
+
+    public Amount CurrentAmount()
+        => _transfers.OfType<IncomingTransfer>().Sum(x => x.Amount) - _transfers.OfType<OutgoingTransfer>().Sum(x => x.Amount); 
 }
