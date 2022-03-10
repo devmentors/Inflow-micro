@@ -56,6 +56,7 @@ internal static class Extensions
             .AddSwaggerDocs()
             .AddCertificateAuthentication()
             .AddSecurity()
+            .AddExceptionToFailedMessageMapper<ExceptionToFailedMessageMapper>()
             .Build();
             
         var postgresOptions = builder.GetOptions<PostgresOptions>("postgres");
