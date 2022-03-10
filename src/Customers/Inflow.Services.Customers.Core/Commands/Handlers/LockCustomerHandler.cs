@@ -2,7 +2,9 @@
 using System.Threading.Tasks;
 using Convey.CQRS.Commands;
 using Inflow.Services.Customers.Core.Domain.Repositories;
+using Inflow.Services.Customers.Core.Events;
 using Inflow.Services.Customers.Core.Exceptions;
+using Inflow.Services.Customers.Core.Services;
 using Microsoft.Extensions.Logging;
 
 namespace Inflow.Services.Customers.Core.Commands.Handlers;
@@ -10,11 +12,14 @@ namespace Inflow.Services.Customers.Core.Commands.Handlers;
 internal sealed class LockCustomerHandler : ICommandHandler<LockCustomer>
 {
     private readonly ICustomerRepository _customerRepository;
+    private readonly IMessageBroker _messageBroker;
     private readonly ILogger<LockCustomerHandler> _logger;
 
-    public LockCustomerHandler(ICustomerRepository customerRepository, ILogger<LockCustomerHandler> logger)
+    public LockCustomerHandler(ICustomerRepository customerRepository, IMessageBroker messageBroker,
+        ILogger<LockCustomerHandler> logger)
     {
         _customerRepository = customerRepository;
+        _messageBroker = messageBroker;
         _logger = logger;
     }
         
@@ -28,6 +33,7 @@ internal sealed class LockCustomerHandler : ICommandHandler<LockCustomer>
             
         customer.Lock(command.Notes);
         await _customerRepository.UpdateAsync(customer);
+        await _messageBroker.PublishAsync(new CustomerLocked(customer.Id));
         _logger.LogInformation($"Locked a customer with ID: '{command.CustomerId}'.");
     }
 }
