@@ -126,6 +126,7 @@ internal static class Extensions
             .SubscribeEvent<CustomerCompleted>()
             .SubscribeEvent<CustomerLocked>()
             .SubscribeEvent<CustomerUnlocked>()
+            .SubscribeEvent<CustomerVerified>()
             .SubscribeEvent<DeductFundsRejected>()
             .SubscribeEvent<FundsDeducted>();
 

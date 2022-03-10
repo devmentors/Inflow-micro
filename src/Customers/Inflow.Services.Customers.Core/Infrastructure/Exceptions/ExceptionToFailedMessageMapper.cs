@@ -12,7 +12,7 @@ internal sealed class ExceptionToFailedMessageMapper : IExceptionToFailedMessage
     public FailedMessage Map(Exception exception, object message)
         => exception switch
         {
-            CustomException ex => new FailedMessage(new CustomerActionRejected(ex.Message, ex.GetExceptionCode()), false),
+            CustomException ex => new FailedMessage(new CustomerActionRejected(ex.GetExceptionCode(), ex.Message), false),
             DbUpdateException => new FailedMessage(false),
             _ => new FailedMessage(new CustomerActionRejected("There was an error", "customers_service_error")),
         };
