@@ -10,6 +10,7 @@ using Convey.Discovery.Consul;
 using Convey.Docs.Swagger;
 using Convey.HTTP;
 using Convey.LoadBalancing.Fabio;
+using Convey.MessageBrokers.CQRS;
 using Convey.MessageBrokers.Outbox;
 using Convey.MessageBrokers.Outbox.EntityFramework;
 using Convey.MessageBrokers.RabbitMQ;
@@ -24,6 +25,7 @@ using Inflow.Services.Customers.Core.Contexts;
 using Inflow.Services.Customers.Core.DAL;
 using Inflow.Services.Customers.Core.DAL.Repositories;
 using Inflow.Services.Customers.Core.Domain.Repositories;
+using Inflow.Services.Customers.Core.Events.External;
 using Inflow.Services.Customers.Core.Infrastructure;
 using Inflow.Services.Customers.Core.Infrastructure.Decorators;
 using Inflow.Services.Customers.Core.Infrastructure.Exceptions;
@@ -100,7 +102,8 @@ internal static class Extensions
             .UseConvey()
             .UseCertificateAuthentication()
             .UseAuthentication()
-            .UseRabbitMq();
+            .UseRabbitMq()
+            .SubscribeEvent<SignedUp>();
 
         using var scope = app.ApplicationServices.CreateScope();
         var database = scope.ServiceProvider.GetRequiredService<CustomersDbContext>().Database;
