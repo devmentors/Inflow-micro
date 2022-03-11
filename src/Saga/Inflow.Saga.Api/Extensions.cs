@@ -7,6 +7,7 @@ using Convey.CQRS.Queries;
 using Convey.Discovery.Consul;
 using Convey.HTTP;
 using Convey.LoadBalancing.Fabio;
+using Convey.MessageBrokers.CQRS;
 using Convey.MessageBrokers.RabbitMQ;
 using Convey.Metrics.Prometheus;
 using Convey.Security;
@@ -16,6 +17,7 @@ using Convey.WebApi.CQRS;
 using Convey.WebApi.Security;
 using Inflow.Saga.Api.Infrastructure;
 using Inflow.Saga.Api.Infrastructure.Serialization;
+using Inflow.Saga.Api.Messages;
 using Inflow.Saga.Api.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -70,7 +72,13 @@ internal static class Extensions
             .UseConvey()
             .UsePrometheus()
             .UseCertificateAuthentication()
-            .UseRabbitMq();
+            .UseRabbitMq()
+            .SubscribeEvent<SignedUp>()
+            .SubscribeEvent<SignedIn>()
+            .SubscribeEvent<CustomerVerified>()
+            .SubscribeEvent<DepositCompleted>()
+            .SubscribeEvent<FundsAdded>()
+            .SubscribeEvent<WalletAdded>();
 
         return app;
     }
