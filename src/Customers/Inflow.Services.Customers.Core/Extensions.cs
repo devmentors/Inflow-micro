@@ -11,6 +11,8 @@ using Convey.Docs.Swagger;
 using Convey.HTTP;
 using Convey.LoadBalancing.Fabio;
 using Convey.MessageBrokers.CQRS;
+using Convey.MessageBrokers.Outbox;
+using Convey.MessageBrokers.Outbox.EntityFramework;
 using Convey.MessageBrokers.RabbitMQ;
 using Convey.Security;
 using Convey.WebApi.CQRS;
@@ -22,6 +24,7 @@ using Inflow.Services.Customers.Core.DAL.Repositories;
 using Inflow.Services.Customers.Core.Domain.Repositories;
 using Inflow.Services.Customers.Core.Events.External;
 using Inflow.Services.Customers.Core.Infrastructure;
+using Inflow.Services.Customers.Core.Infrastructure.Decorators;
 using Inflow.Services.Customers.Core.Infrastructure.Exceptions;
 using Inflow.Services.Customers.Core.Infrastructure.Logging;
 using Inflow.Services.Customers.Core.Infrastructure.Serialization;
@@ -57,6 +60,7 @@ internal static class Extensions
             .AddCertificateAuthentication()
             .AddSecurity()
             .AddExceptionToFailedMessageMapper<ExceptionToFailedMessageMapper>()
+            .AddMessageOutbox(outbox => outbox.AddEntityFramework<CustomersDbContext>())
             .Build();
             
         var postgresOptions = builder.GetOptions<PostgresOptions>("postgres");
@@ -82,8 +86,8 @@ internal static class Extensions
 
         builder.Services.AddSingleton<IUserApiClient, UserApiClient>();
 
-        // builder.Services.TryDecorate(typeof(ICommandHandler<>), typeof(OutboxCommandHandlerDecorator<>));
-        // builder.Services.TryDecorate(typeof(IEventHandler<>), typeof(OutboxEventHandlerDecorator<>));
+        builder.Services.TryDecorate(typeof(ICommandHandler<>), typeof(OutboxCommandHandlerDecorator<>));
+        builder.Services.TryDecorate(typeof(IEventHandler<>), typeof(OutboxEventHandlerDecorator<>));
 
         return builder;
     }

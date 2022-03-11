@@ -131,6 +131,7 @@ internal static class Extensions
             .SubscribeEvent<CustomerCompleted>()
             .SubscribeEvent<CustomerVerified>()
             .SubscribeEvent<DepositAccountAdded>()
+            .SubscribeEvent<DepositCompleted>()
             .SubscribeEvent<WithdrawalStarted>();
 
         using var scope = app.ApplicationServices.CreateScope();
