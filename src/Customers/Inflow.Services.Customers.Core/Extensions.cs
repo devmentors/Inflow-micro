@@ -15,6 +15,7 @@ using Convey.MessageBrokers.Outbox;
 using Convey.MessageBrokers.Outbox.EntityFramework;
 using Convey.MessageBrokers.RabbitMQ;
 using Convey.Security;
+using Convey.Tracing.Jaeger;
 using Convey.WebApi.CQRS;
 using Convey.WebApi.Security;
 using Inflow.Services.Customers.Core.Clients;
@@ -55,6 +56,7 @@ internal static class Extensions
             .AddHttpClient()
             .AddConsul()
             .AddFabio()
+            .AddJaeger()
             .AddRabbitMq()
             .AddSwaggerDocs()
             .AddCertificateAuthentication()

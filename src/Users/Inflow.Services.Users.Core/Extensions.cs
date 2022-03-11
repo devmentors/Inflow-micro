@@ -10,6 +10,7 @@ using Convey.Discovery.Consul;
 using Convey.Docs.Swagger;
 using Convey.HTTP;
 using Convey.LoadBalancing.Fabio;
+using Convey.MessageBrokers.CQRS;
 using Convey.MessageBrokers.Outbox;
 using Convey.MessageBrokers.Outbox.EntityFramework;
 using Convey.MessageBrokers.RabbitMQ;
@@ -19,6 +20,7 @@ using Convey.Tracing.Jaeger;
 using Convey.Tracing.Jaeger.RabbitMQ;
 using Convey.WebApi.CQRS;
 using Convey.WebApi.Security;
+using Inflow.Services.Users.Core.Commands;
 using Inflow.Services.Users.Core.Contexts;
 using Inflow.Services.Users.Core.DAL;
 using Inflow.Services.Users.Core.DAL.Repositories;
@@ -118,7 +120,8 @@ internal static class Extensions
             .UsePrometheus()
             .UseCertificateAuthentication()
             .UseAuthentication()
-            .UseRabbitMq();
+            .UseRabbitMq()
+            .SubscribeCommand<SignUp>();
 
         using var scope = app.ApplicationServices.CreateScope();
         var database = scope.ServiceProvider.GetRequiredService<UsersDbContext>().Database;
